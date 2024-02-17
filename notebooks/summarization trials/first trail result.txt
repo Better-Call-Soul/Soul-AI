@@ -1,0 +1,21 @@
+omar samir:
+
+huge repo question (PG , transformer)
+fine tuning, bart (pretrained model) training
+
+coding effort: found a paper with naive ML approach
+https://www.researchgate.net/publication/372988411_Summarizing_Online_Conversations_A_Machine_Learning_Approach
+
+
+priority 
+dataset refining (many sources)
+
+
+eslam question: dataset labeling									(FUTURE WORK)
+	1. gpt interface | pretrained LLM that summarize good kinda 
+	2. حوار الضماير وان الموديل هيلخص كلام اليوزر والشات
+	3. 
+
+
+to nour ==> implement this until we meet omar
+https://github.com/rohithreddy024/Text-Summarizer-Pytorch
