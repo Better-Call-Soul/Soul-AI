@@ -1,1 +1,1 @@
-from expand_contractions import *
+from .expand_contractions import *

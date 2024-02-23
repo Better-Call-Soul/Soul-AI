@@ -1,7 +1,8 @@
 import re
-import nltk
 import math
 from nltk.tokenize import word_tokenize
+from utils.expand_contractions import *
+
 
 # Class for machine learning based summarization of text using tf-idf algorithm
 class MachineLearningSummarization:
@@ -9,6 +10,7 @@ class MachineLearningSummarization:
         self.threshold=threshold
     # Clean the text
     def clean_text(self,text):
+        text=expand_contractions(text) # expand the contractions
         text=text.split(". ")
         sentences =[]
         # remove non-english characters and extra whitespaces
@@ -137,4 +139,4 @@ class MachineLearningSummarization:
     
 if(__name__ == "__main__"):
     summ=MachineLearningSummarization()
-    print(summ.summary("The cat is in the box. The cat likes the box. The box is in the house. The house is in the city. The city is in the country. The country is in the world."))
+    print(summ.summary("The cat isn't in the box. The cat likes the box. The box is in the house. The house is in the city. The city is in the country. The country is in the world."))
