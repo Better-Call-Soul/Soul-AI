@@ -2,7 +2,7 @@ import re
 import math
 from nltk.tokenize import word_tokenize
 from utils.expand_contractions import *
-
+from nltk.corpus import stopwords
 
 # Class for machine learning based summarization of text using tf-idf algorithm
 class MachineLearningSummarization:
@@ -11,11 +11,13 @@ class MachineLearningSummarization:
     # Clean the text
     def clean_text(self,text):
         text=expand_contractions(text) # expand the contractions
-        text=text.split(". ")
+        statements = re.findall(r'[^.!?,]+[.!?,]', text)
+        # Remove any leading or trailing whitespace from each statement
+        text = [statement.strip() for statement in statements]
         sentences =[]
         # remove non-english characters and extra whitespaces
         for sentence in text:
-            sentence = re.sub(r'[^a-zA-Z ]+', '', str(sentence))
+            sentence = re.sub(r'[^a-zA-Z .!?,]+', '', str(sentence))
             sentence = re.sub(r"\s+", " ", sentence)
             sentences.append(sentence)
         join_sentences = ". ".join(sentences)
@@ -26,13 +28,14 @@ class MachineLearningSummarization:
     def count_words(self,text):
         # Tokenize the text
         words = word_tokenize(text)
+        words=[word for word in words if word not in  stopwords.words('english')] # remove non-alphabetic characters
         return len(words)
     
     # Count the number of words in each sentence
     def count_in_sentences(self, sentences):
         count=[]
         for i,sentence in enumerate(sentences):
-            temp={'id':i,'word_count':self.count_words(sentence)}
+            temp={'id':i,'word_count':self.count_words(sentence[:-1])}
             count.append(temp)
         return count
     
@@ -40,9 +43,11 @@ class MachineLearningSummarization:
     def freq_dict(self,sentences):
         freq_list=[]
         for i,sentence in enumerate(sentences):
-            words = word_tokenize(sentence) # tokenize the sentence
+            words = word_tokenize(sentence[:-1]) # tokenize the sentence
             freq_dict = {}
             for word in words:
+                if(word in stopwords.words('english')): # remove stop words
+                    continue
                 word=word.lower() # convert to lower case
                 if word in freq_dict:
                     freq_dict[word] += 1
@@ -71,8 +76,9 @@ class MachineLearningSummarization:
         for freq in freq_list:# loop for each sentence
             id=freq['id']
             for k in freq['freq']: # loop for each word
+                # idf=log(total sentences/count of sentences containing the word+1)
                 count=sum([k in f['freq'] for f in freq_list]) # count of sentences containing the word
-                temp={'id':id,'word':k,'idf':math.log(len(text)/(count+1))}
+                temp={'id':id,'word':k,'idf':math.log(len(text)/(count+1))} ## +1 for smoothing
                 idf_list.append(temp)
         return idf_list
     
@@ -114,7 +120,8 @@ class MachineLearningSummarization:
         for sent in data:
             if(sent['score']>=(avg*self.threshold)):
                 summary.append(sent['sentence'])
-        summary=". ".join(summary)
+        
+        summary=" ".join(summary)
         return summary
 
     # Generate the summary

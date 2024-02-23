@@ -242,12 +242,3 @@ contractions_dict = {
 "you’re": "you are",
 "you’ve": "you have",
 }
-# Create a regular expression pattern to match all contractions
-contractions_re = re.compile('(%s)' % '|'.join(contractions_dict.keys()))
-
-# Function expand the contractions if there's any
-def expand_contractions(s, contractions_dict=contractions_dict):
-    def replace(match):
-        return contractions_dict[match.group(0)]
-    # Replace the contractions in the text
-    return contractions_re.sub(replace, s)

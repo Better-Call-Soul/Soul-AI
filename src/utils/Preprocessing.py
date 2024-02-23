@@ -1,13 +1,10 @@
-import re
-import pandas as pd
-import math
 
-class DialogDataSet:
-    dataset_path=""
-    def __init__(self, dataset_path):
-        self.dataset_path = dataset_path
-    def remove_emojis(self,text):
-        pattern = r"\([^A-Za-z\s]+\)"
+import re
+from typing import List
+
+class Preprocessing:
+    def remove_emojis(self,text:str) -> str:
+        pattern = r"\([^A-Za-z]*\)"
 
         # Remove the pattern from the text using the regular expression
         text = re.sub(pattern, '', text)
@@ -40,7 +37,7 @@ class DialogDataSet:
         # Remove emoticons using the pattern
         return emoticon_pattern.sub('', text)
 
-    def expand_contractions(self,text):
+    def expand_contractions(self,text:str) -> str:
         # Define a dictionary of common contractions and their expanded forms
         text = re.sub(r"n\'t", " not", text)
         text = re.sub(r"\'re", " are", text)
@@ -72,17 +69,7 @@ class DialogDataSet:
             text = re.sub(r"\b{}\b".format(short_form), expansion, text)
         return text
 
-    def check_file_pattern(self,text):
-        # Define a regular expression pattern to match <file_...>
-        pattern = r'<file_\w+>'
-        
-        # Search for the pattern in the text
-        match = re.search(pattern, text)
-        
-        # If a match is found, return an empty string, otherwise return the original text
-        return match
-
-    def replace_repeated_chars(self,text):
+    def replace_repeated_chars(self,text:str) -> str:
         # Replace consecutive occurrences of ',' with a single ','
         text = re.sub(r'\,{2,}', ',', text)
         # Replace consecutive occurrences of '!' with a single '!'
@@ -93,59 +80,16 @@ class DialogDataSet:
         text = re.sub(r'\?{2,}', '?', text)
         return text
     
-    def create_conversation(self,text):
-        # Initialize a dictionary to store messages for each speaker
-        speaker_messages = []
-        
-        # Iterate through each line
-        current_speaker = None
-        prev_speaker=None
-        temp_text=''
-        for line in text:
-            if(line==""):
-                continue
-            # Check if the line contains a speaker name
-            match = re.match(r'^([A-Za-z\.\s_-]+):', line)
-            if match:
-                current_speaker = match.group(1)
-            if prev_speaker != None and current_speaker!=prev_speaker:
-                speaker_messages.append(temp_text)
-            print(line)
-            # Append the message to the current speaker's messages list
-            if current_speaker==prev_speaker:
-                temp_text = temp_text+ " "+line[len(current_speaker)+1:].strip()
-            else:
-                temp_text= line
-            prev_speaker=current_speaker
-        return speaker_messages
 
-    def preprocess_text(self,text,isDialogue=False):
-        print("text :", type(text))
-        if(not isinstance(text, str) or self.check_file_pattern(text)):
-            return ""
+    def preprocess_text(self,text:List[str]) -> List[str]:
+        print("Initial text :", text)
         # Remove non-English characters
-        text = re.sub(r'[^\x00-\x7F]+', '', text)
-        text=text.split("\n")
-        if(isDialogue):
-            text=self.create_conversation(text)
+        text = [re.sub(r'[^\x00-\x7F]+', '', statement)for statement in text]
         # Remove leading and trailing whitespaces
-        text=[re.sub(r"\s+", " ", self.expand_contractions(self.replace_repeated_chars(self.remove_emoticons(self.remove_emojis(statement)))).lower()) for statement in text ]
-        text="<s></s>".join(text)
-        # Add <s> and </s> to the beginning and end of the text
-        text="<s>"+text+"</s>"
+        text=[re.sub(r"\s+", " ", self.expand_contractions(self.replace_repeated_chars(self.remove_emoticons(self.remove_emojis(statement))))) for statement in text ]
         return text
 
-    def preprocess_data(self):
-        data=pd.read_csv(self.dataset_path)
-        for index,row in data.iterrows():
-            print(index,'\n')
-            row['dialogue']=self.preprocess_text(row['dialogue'],True)
-            row['summary']=self.preprocess_text(row['summary'])
-        data_cleaned =data.drop(data[(data == '').any(axis=1)].index)
-        data_cleaned.to_csv('preprocessed_dataset.csv', index=False)
-
-
-# test
-if __name__ == '__main__':
-    dataset = DialogDataSet("data/raw/summarization/samsum/train.csv")
-    dataset.preprocess_data()
+if __name__ == "__main__":
+    text = "I'm going to the store . I'll be back soon. I'm going to the store. I'll be back soon."
+    p = Preprocessing()
+    print(p.preprocess_text([text]))
