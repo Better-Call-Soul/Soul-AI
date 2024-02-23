@@ -1,11 +1,14 @@
 
 import re
 from typing import List
+from utils.expand_contractions import *
 
 class Preprocessing:
+    def __init__(self):
+        self.contractions_re = re.compile('(%s)' % '|'.join(contractions_dict.keys()))
+
     def remove_emojis(self,text:str) -> str:
         pattern = r"\([^A-Za-z]*\)"
-
         # Remove the pattern from the text using the regular expression
         text = re.sub(pattern, '', text)
         emoji_pattern = re.compile("["
@@ -37,37 +40,12 @@ class Preprocessing:
         # Remove emoticons using the pattern
         return emoticon_pattern.sub('', text)
 
+    # Expand the contractions in the text
     def expand_contractions(self,text:str) -> str:
-        # Define a dictionary of common contractions and their expanded forms
-        text = re.sub(r"n\'t", " not", text)
-        text = re.sub(r"\'re", " are", text)
-        text = re.sub(r"\'s", " is", text)
-        text = re.sub(r"\'d", " would", text)
-        text = re.sub(r"\'ll", " will", text)
-        text = re.sub(r"\'t", " not", text)
-        text = re.sub(r"\'ve", " have", text)
-        text = re.sub(r"\'m", " am", text)
-        text = re.sub(r"\'em", " them", text)
-        text = re.sub(r"ma’am", "madam", text)
-        short_forms = [
-            ("btw", "by the way"),
-            ("eg", "for example"),
-            ("etc", "et cetera"),
-            ("i.e.", "that is"),
-            ("imho", "in my humble opinion"),
-            ("lol", "laugh out loud"),
-            ("msg", "message"),
-            ("nsfw", "not safe for work"),
-            ("omg", "oh my god"),
-            ("plz", "please"),
-            ("qr", "quick reply"),
-            ("tbh", "to be honest"),
-            ("wtf", "what the f*ck"),
-        ]
-        # Expand all short forms in the text.
-        for short_form, expansion in short_forms:
-            text = re.sub(r"\b{}\b".format(short_form), expansion, text)
-        return text
+        def replace(match):
+            return contractions_dict[match.group(0)]
+        # Replace the contractions in the text
+        return self.contractions_re.sub(replace, text)
 
     def replace_repeated_chars(self,text:str) -> str:
         # Replace consecutive occurrences of ',' with a single ','
@@ -80,13 +58,48 @@ class Preprocessing:
         text = re.sub(r'\?{2,}', '?', text)
         return text
     
+    # Function to clean the html from the article
+    def clean_HTML(self,text:str) -> str:
+        cleanr = re.compile('<.*?>')
+        text = re.sub(cleanr, '', text)
+        return text
 
+    def clean_text(self,text:str) -> str:
+        text=  text.lower()
+        # Removing the email ids
+        text =  re.sub('\S+@\S+','', text)
+        
+        # Removing the contractions
+        text =  self.expand_contractions(text)
+        # Removing The URLS
+        text =  re.sub("((http\://|https\://|ftp\://)|(www.))+(([a-zA-Z0-9\.-]+\.[a-zA-Z]{2,4})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(/[a-zA-Z0-9%:/-_\?\.'~]*)?",'', text)
+
+        # Stripping the possessives
+        text =  text.replace("'s", '')
+        text =  text.replace('’s', '')
+        text =  text.replace("\'s", '')
+        text =  text.replace("\’s", '')
+
+        # Removing the Trailing and leading whitespace and double spaces
+        text =  re.sub(' +', ' ',text)
+
+        # Removing the Trailing and leading whitespace and double spaces again as removing punctuation might
+        # Lead to a white space
+        text =  re.sub(' +', ' ',text)
+
+        return text
+        
     def preprocess_text(self,text:List[str]) -> List[str]:
         print("Initial text :", text)
         # Remove non-English characters
         text = [re.sub(r'[^\x00-\x7F]+', '', statement)for statement in text]
         # Remove leading and trailing whitespaces
-        text=[re.sub(r"\s+", " ", self.expand_contractions(self.replace_repeated_chars(self.remove_emoticons(self.remove_emojis(statement))))) for statement in text ]
+        text=[re.sub(r"\s+", " ", self.clean_HTML( # Expand the contractions in the text
+                                self.replace_repeated_chars( # Replace repeated characters in the text
+                                self.remove_emoticons( # Remove emoticons from the text
+                                self.remove_emojis(
+                                self.clean_text(statement.lower())))))) # Clean the text
+                                for statement in text ]
         return text
 
 if __name__ == "__main__":

@@ -1,6 +1,4 @@
-import re
-
-contractions_dict = { 
+contractions_dict = {
 "ain't": "am not",
 "aren't": "are not",
 "can't": "cannot",
@@ -241,4 +239,17 @@ contractions_dict = {
 "you’re": "you are",
 "you’re": "you are",
 "you’ve": "you have",
+"btw": "by the way",
+"eg": "for example",
+"etc": "et cetera",
+"i.e.": "that is",
+"imho": "in my humble opinion",
+"lol": "laugh out loud",
+"msg": "message",
+"nsfw": "not safe for work",
+"omg": "oh my god",
+"plz": "please",
+"qr": "quick reply",
+"tbh": "to be honest",
+"wtf": "what the f*ck",
 }

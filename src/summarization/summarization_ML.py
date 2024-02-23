@@ -1,7 +1,6 @@
 import re
 import math
 from nltk.tokenize import word_tokenize
-from utils.expand_contractions import *
 from nltk.corpus import stopwords
 
 # Class for machine learning based summarization of text using tf-idf algorithm
