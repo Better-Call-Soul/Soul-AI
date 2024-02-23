@@ -242,7 +242,6 @@ contractions_dict = {
 "btw": "by the way",
 "eg": "for example",
 "etc": "et cetera",
-"i.e.": "that is",
 "imho": "in my humble opinion",
 "lol": "laugh out loud",
 "msg": "message",

@@ -2,11 +2,17 @@
 import re
 from typing import List
 from utils.expand_contractions import *
+import spacy
+from fastcoref import spacy_component
 
+# class for preprocessing the text data and soma basic NLP tasks
 class Preprocessing:
     def __init__(self):
         self.contractions_re = re.compile('(%s)' % '|'.join(contractions_dict.keys()))
-
+        # Load the English language model
+        self.nlp = spacy.load("en_core_web_sm")
+        self.nlp_fastcoref = spacy.load("en_core_web_sm")
+        self.nlp_fastcoref.add_pipe("fastcoref")
     def remove_emojis(self,text:str) -> str:
         pattern = r"\([^A-Za-z]*\)"
         # Remove the pattern from the text using the regular expression
@@ -56,6 +62,10 @@ class Preprocessing:
         text = re.sub(r'\.{2,}', '.', text)
         # Replace consecutive occurrences of '?' with a single '?'
         text = re.sub(r'\?{2,}', '?', text)
+        statements = re.findall(r'[^.!?,]+[.!?,]', text)
+        # Remove any leading or trailing whitespace from each statement
+        text = [statement.strip() for statement in statements]
+        text = " ".join(text)
         return text
     
     # Function to clean the html from the article
@@ -90,7 +100,6 @@ class Preprocessing:
         return text
         
     def preprocess_text(self,text:List[str]) -> List[str]:
-        print("Initial text :", text)
         # Remove non-English characters
         text = [re.sub(r'[^\x00-\x7F]+', '', statement)for statement in text]
         # Remove leading and trailing whitespaces
@@ -102,7 +111,33 @@ class Preprocessing:
                                 for statement in text ]
         return text
 
-if __name__ == "__main__":
-    text = "I'm going to the store . I'll be back soon. I'm going to the store. I'll be back soon."
-    p = Preprocessing()
-    print(p.preprocess_text([text]))
+    # Function to capitalize the entities in the text
+    def capitalize(self,text:str) -> str:
+        # Process the text using spaCy
+        doc = self.nlp(text)
+
+        # Iterate over each entity in the document
+        for ent in doc.ents:
+            # Check if the entity is a GPE (Geopolitical Entity, like cities)
+            if ent.label_ in ("GPE", "PERSON", "ORG"):
+                # Capitalize the entity text
+                text = text.replace(ent.text, ent.text.capitalize())
+        def uppercase(matchobj):
+            return matchobj.group(0).upper()
+        # 1) Capitalize the first of the string if it is a letter
+        # 2) Capitalize after every period, question mark or exclamation mark
+        # 3) Capitalize the letter if there is a period after it and no letters before it
+        
+        text=re.sub('^([a-z])|[\.|\?|\!]\s*([a-z])|\s+([a-z])(?=\.)', uppercase, text)
+        return text
+    def coreference_resolution(self,text:str)->str:
+        doc =self.nlp_fastcoref(      # for multiple texts use nlp.pipe
+        text,
+        component_cfg={"fastcoref": {'resolve_text': True}}
+        )
+        return doc._.resolved_text
+
+# if __name__ == "__main__":
+#     text = "I'm going to the store . I'll be back soon. I'm going to the store. I'll be back soon."
+#     p = Preprocessing()
+#     print(p.preprocess_text([text]))

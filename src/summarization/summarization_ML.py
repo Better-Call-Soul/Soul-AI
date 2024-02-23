@@ -2,25 +2,23 @@ import re
 import math
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from preprocessing.preprocessing import Preprocessing
 
 # Class for machine learning based summarization of text using tf-idf algorithm
 class MachineLearningSummarization:
     def __init__(self,threshold=0.9):
         self.threshold=threshold
+        self.preprocess=Preprocessing()
     # Clean the text
     def clean_text(self,text):
-        text=expand_contractions(text) # expand the contractions
-        statements = re.findall(r'[^.!?,]+[.!?,]', text)
-        # Remove any leading or trailing whitespace from each statement
-        text = [statement.strip() for statement in statements]
+        text=self.preprocess.coreference_resolution(text)
+        statements = re.findall(r'[^.!?]+[.!?]', text)
         sentences =[]
         # remove non-english characters and extra whitespaces
-        for sentence in text:
-            sentence = re.sub(r'[^a-zA-Z .!?,]+', '', str(sentence))
-            sentence = re.sub(r"\s+", " ", sentence)
+        for sentence in statements:
+            sentence=self.preprocess.preprocess_text([sentence])[0]
             sentences.append(sentence)
-        join_sentences = ". ".join(sentences)
-        print("Initial text: ", join_sentences,"\n")
+
         return sentences
     
     # Count the number of words in the text
@@ -141,8 +139,10 @@ class MachineLearningSummarization:
         sent_data=self.score_sentences(sentences,tf_idf_list,text)
         # step8: rank the sentences based on the score
         summary=self.rank_sentence(sent_data)
+        # step9: capitalize the first letter of the summary
+        summary=self.preprocess.capitalize(summary)
         return summary
     
-if(__name__ == "__main__"):
-    summ=MachineLearningSummarization()
-    print(summ.summary("The cat isn't in the box. The cat likes the box. The box is in the house. The house is in the city. The city is in the country. The country is in the world."))
+# if(__name__ == "__main__"):
+#     summ=MachineLearningSummarization()
+#     print(summ.summary("The cat isn't in the box. The cat likes the box. The box is in the house. The house is in the city. The city is in the country. The country is in the world."))
