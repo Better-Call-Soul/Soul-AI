@@ -4,16 +4,18 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from preprocessing.preprocessing import Preprocessing
 from preprocessing.fastcoref import Fastcoref
+from preprocessing.capitalize import Capitalize
 
 # Class for machine learning based summarization of text using tf-idf algorithm
 class MachineLearningSummarization:
     def __init__(self,threshold=0.9):
         self.threshold=threshold
         self.preprocess=Preprocessing()
-        self.capitalize=Fastcoref()
+        self.fastcoref=Fastcoref()
+        self.capitalize=Capitalize()
     # Clean the text
     def clean_text(self,text):
-        text=self.capitalize.coreference_resolution(text)
+        text=self.fastcoref.coreference_resolution(text)
         statements = re.findall(r'[^.!?]+[.!?]', text)
         sentences =[]
         # remove non-english characters and extra whitespaces

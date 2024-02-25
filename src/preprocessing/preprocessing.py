@@ -8,8 +8,7 @@ import spacy
 class Preprocessing:
     def __init__(self):
         self.contractions_re = re.compile('(%s)' % '|'.join(contractions_dict.keys()))
-        # Load the English language model
-        self.nlp = spacy.load("en_core_web_sm")
+
     def remove_emojis(self,text:str) -> str:
         pattern = r"\([^A-Za-z]*\)"
         # Remove the pattern from the text using the regular expression
