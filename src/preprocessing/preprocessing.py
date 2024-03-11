@@ -58,10 +58,7 @@ class Preprocessing:
         text = re.sub(r'\.{2,}', '.', text)
         # Replace consecutive occurrences of '?' with a single '?'
         text = re.sub(r'\?{2,}', '?', text)
-        statements = re.findall(r'[^.!?,]+[.!?,]', text)
-        # Remove any leading or trailing whitespace from each statement
-        text = [statement.strip() for statement in statements]
-        text = " ".join(text)
+
         return text
     
     # Function to clean the html from the article
@@ -94,7 +91,7 @@ class Preprocessing:
         text =  re.sub(' +', ' ',text)
 
         return text
-        
+
     def preprocess_text(self,text:List[str]) -> List[str]:
         # Remove non-English characters
         text = [re.sub(r'[^\x00-\x7F]+', '', statement)for statement in text]
@@ -110,6 +107,6 @@ class Preprocessing:
 
 
 # if __name__ == "__main__":
-#     text = "I'm going to the store . I'll be back soon. I'm going to the store. I'll be back soon."
-#     p = Preprocessing()
-#     print(p.preprocess_text([text]))
+    # text = "4 ex-bank officials booked for cheating bank of ₹209 crore"
+    # p = Preprocessing()
+    # print(p.preprocess_text([text]))

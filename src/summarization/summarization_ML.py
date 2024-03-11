@@ -108,7 +108,7 @@ class MachineLearningSummarization:
             temp={'id':id,'score':score,'sentence':sentences[id]}
             sent_data.append(temp)
         return sent_data
-    
+
     # Rank the sentences based on the score
     def rank_sentence(self, data):
         count=0
@@ -121,7 +121,6 @@ class MachineLearningSummarization:
         for sent in data:
             if(sent['score']>=(avg*self.threshold)):
                 summary.append(sent['sentence'])
-        
         summary=" ".join(summary)
         return summary
 
