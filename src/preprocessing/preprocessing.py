@@ -1,13 +1,12 @@
 
 import re
 from typing import List
-from utils.expand_contractions import *
-import spacy
+import contractions
 
 # class for preprocessing the text data and soma basic NLP tasks
 class Preprocessing:
     def __init__(self):
-        self.contractions_re = re.compile('(%s)' % '|'.join(contractions_dict.keys()))
+        pass
 
     def remove_emojis(self,text:str) -> str:
         pattern = r"\([^A-Za-z]*\)"
@@ -44,10 +43,7 @@ class Preprocessing:
 
     # Expand the contractions in the text
     def expand_contractions(self,text:str) -> str:
-        def replace(match):
-            return contractions_dict[match.group(0)]
-        # Replace the contractions in the text
-        return self.contractions_re.sub(replace, text)
+        return contractions.fix(text)
 
     def replace_repeated_chars(self,text:str) -> str:
         # Replace consecutive occurrences of ',' with a single ','
@@ -94,7 +90,7 @@ class Preprocessing:
 
     def preprocess_text(self,text:List[str]) -> List[str]:
         # Remove non-English characters
-        text = [re.sub(r'[^\x00-\x7F]+', '', statement)for statement in text]
+        text=[statement.strip() for statement in text]
         # Remove leading and trailing whitespaces
         text=[re.sub(r"\s+", " ", self.clean_HTML( # Expand the contractions in the text
                                 self.replace_repeated_chars( # Replace repeated characters in the text
@@ -102,6 +98,8 @@ class Preprocessing:
                                 self.remove_emojis(
                                 self.clean_text(statement.lower())))))) # Clean the text
                                 for statement in text ]
+        text = [re.sub(r'[^\x00-\x7F]+', '', statement)for statement in text]
+
         return text
 
 

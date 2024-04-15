@@ -5,6 +5,7 @@ from nltk.corpus import stopwords
 from preprocessing.preprocessing import Preprocessing
 from preprocessing.fastcoref import Fastcoref
 from preprocessing.capitalize import Capitalize
+from nltk.stem import PorterStemmer
 
 # Class for machine learning based summarization of text using tf-idf algorithm
 class MachineLearningSummarization:
@@ -13,6 +14,8 @@ class MachineLearningSummarization:
         self.preprocess=Preprocessing()
         self.fastcoref=Fastcoref()
         self.capitalize=Capitalize()
+        self.ps =PorterStemmer()
+
     # Clean the text
     def clean_text(self,text):
         text=self.fastcoref.coreference_resolution(text)
@@ -50,6 +53,8 @@ class MachineLearningSummarization:
                 if(word in stopwords.words('english')): # remove stop words
                     continue
                 word=word.lower() # convert to lower case
+                word=self.ps.stem(word)
+
                 if word in freq_dict:
                     freq_dict[word] += 1
                 else:
