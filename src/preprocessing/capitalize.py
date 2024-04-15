@@ -6,7 +6,9 @@ import re
 class Capitalize:
     def __init__(self):
         # Load the English language model
-        self.nlp = spacy.load("en_core_web_sm")
+        # self.nlp = spacy.load("en_core_web_sm")
+        self.nlp = spacy.load("/content/drive/MyDrive/GP/preprocessing/en_core_web_sm")
+
     # Function to capitalize the entities in the text
     def capitalize(self,text:str) -> str:
         # Process the text using spaCy
