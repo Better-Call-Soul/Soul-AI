@@ -1,5 +1,6 @@
-docx==0.2.4
-matplotlib==3.8.2
-numpy==1.26.4
-python_docx==1.1.0
-
+contractions==0.1.73
+nltk==3.8.1
+spacy==3.7.4
+fastcoref==2.1.6
+nltk==3.8.1
+spacy==3.7.4
