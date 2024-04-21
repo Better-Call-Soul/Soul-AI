@@ -119,10 +119,10 @@ class MachineLearningSummarization:
         for t_dict in data:
             count+=t_dict['score']
         avg=count/len(data) # average score
+        threshold_score = avg * self.threshold
         # loop for each sentence
-        for sent in data:
-            if(sent['score']>=(avg*self.threshold)):
-                summary.append(sent['sentence'])
+        summary = [item['sentence'] for item in data if item['score'] >= threshold_score]
+
         summary=" ".join(summary)
         return summary
 

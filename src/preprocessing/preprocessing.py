@@ -74,10 +74,10 @@ class Preprocessing:
         text =  re.sub("((http\://|https\://|ftp\://)|(www.))+(([a-zA-Z0-9\.-]+\.[a-zA-Z]{2,4})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(/[a-zA-Z0-9%:/-_\?\.'~]*)?",'', text)
 
         # Stripping the possessives
-        text =  text.replace("'s", '')
-        text =  text.replace('’s', '')
-        text =  text.replace("\'s", '')
-        text =  text.replace("\’s", '')
+        # text =  text.replace("'s", '')
+        # text =  text.replace('’s', '')
+        # text =  text.replace("\'s", '')
+        # text =  text.replace("\’s", '')
 
         # Removing the Trailing and leading whitespace and double spaces
         text =  re.sub(' +', ' ',text)
