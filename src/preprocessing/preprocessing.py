@@ -64,7 +64,6 @@ class Preprocessing:
         return text
 
     def clean_text(self,text:str) -> str:
-        text=  text.lower()
         # Removing the email ids
         text =  re.sub('\S+@\S+','', text)
         
@@ -73,33 +72,29 @@ class Preprocessing:
         # Removing The URLS
         text =  re.sub("((http\://|https\://|ftp\://)|(www.))+(([a-zA-Z0-9\.-]+\.[a-zA-Z]{2,4})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(/[a-zA-Z0-9%:/-_\?\.'~]*)?",'', text)
 
-        # Stripping the possessives
-        # text =  text.replace("'s", '')
-        # text =  text.replace('’s', '')
-        # text =  text.replace("\'s", '')
-        # text =  text.replace("\’s", '')
-
         # Removing the Trailing and leading whitespace and double spaces
         text =  re.sub(' +', ' ',text)
 
         # Removing the Trailing and leading whitespace and double spaces again as removing punctuation might
         # Lead to a white space
         text =  re.sub(' +', ' ',text)
-
+        # remove spaces
+        text = re.sub("[ \t\r]+", " ", text)
+        # remove nonenglish letter
+        text = re.sub(r'[^\x00-\x7F]+', '', text)
         return text
 
     def preprocess_text(self,text:List[str]) -> List[str]:
+        print(text)
         # Remove non-English characters
-        text=[statement.strip() for statement in text]
+        # text=[statement.strip() for statement in text]
         # Remove leading and trailing whitespaces
-        text=[re.sub(r"\s+", " ", self.clean_HTML( # Expand the contractions in the text
+        text=[ self.clean_HTML( # Expand the contractions in the text
                                 self.replace_repeated_chars( # Replace repeated characters in the text
                                 self.remove_emoticons( # Remove emoticons from the text
                                 self.remove_emojis(
-                                self.clean_text(statement.lower())))))) # Clean the text
+                                self.clean_text(statement.strip()))))) # Clean the text
                                 for statement in text ]
-        text = [re.sub(r'[^\x00-\x7F]+', '', statement)for statement in text]
-
         return text
 
 
