@@ -8,8 +8,11 @@ import torch
 
 ## Class for fine-tuning the model
 class SummarizationFineTuning:
-    def __init__(self,dataset_path):
-        self.dataset_path=dataset_path
+    def __init__(self,dataset):
+        self.dataset= load_dataset(dataset)
+        # check if dataset is valid
+        if self.dataset is None:
+            raise ValueError("Dataset not found")
         self.metric = load_metric("rouge")
     
     # Process the data for training
@@ -28,15 +31,15 @@ class SummarizationFineTuning:
         model_inputs["labels"] = labels["input_ids"]
         return model_inputs
     
-    ## Load data for training
-    def load_data_training(self):
-        train = load_dataset("csv", data_files="train.csv")["train"]
-        val = load_dataset("csv", data_files="validation.csv")["train"]
-        # train = pd.read_csv(self.dataset_path+"train.csv")
-        train=self.process(train)
-        # val=pd.read_csv(self.dataset_path+"validation.csv")
-        val=self.process(val)
-        return train,val
+    # ## Load data for training
+    # def load_data_training(self):
+    #     train = load_dataset("csv", data_files=self.dataset_path+"train.csv")["train"]
+    #     val = load_dataset("csv", data_files=self.dataset_path+"validation.csv")["train"]
+    #     # train = pd.read_csv(self.dataset_path+"train.csv")
+    #     train=self.process(train)
+    #     # val=pd.read_csv(self.dataset_path+"validation.csv")
+    #     val=self.process(val)
+    #     return train,val
     
     ## Compute Rouge score during validation
     def compute_metrics(self,eval_pred):
@@ -68,8 +71,7 @@ class SummarizationFineTuning:
         self.max_input_length=max_input_length
         self.max_target_length=max_target_length
         self.batch_size=batch_size
-        train,val=self.load_data_training()
-        print(train.keys())
+        tokenized_dataset = self.dataset.map(self.process, batched=True)        
         # Define training args
         args = Seq2SeqTrainingArguments(
             "dialogue-summarization", #
@@ -89,8 +91,8 @@ class SummarizationFineTuning:
         trainer = Seq2SeqTrainer(
         model,
         args,
-        train_dataset=train,
-        eval_dataset=val,
+        train_dataset=tokenized_dataset["train"],
+        eval_dataset=tokenized_dataset["validation"],
         data_collator=collator,
         tokenizer=self.tokenizer,
         compute_metrics=self.compute_metrics
