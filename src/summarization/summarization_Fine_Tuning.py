@@ -14,12 +14,16 @@ class SummarizationFineTuning:
     
     # Process the data for training
     def process(self,data,tokenizer,max_input_length,max_target_length):
-        inputs = [doc for doc in data["dialogue"]]
+        inputs = [str(doc) for doc in data["dialogue"]]
         model_inputs = tokenizer(inputs, max_length=max_input_length, truncation=True)
+        if isinstance(data["summary"], pd.Series):
+            summaries = data["summary"].tolist()  # convert Series to list
+        else:
+            summaries = [str(summary) for summary in data["summary"]]  # convert each summary to string
 
         # Setup the tokenizer for summary process
         with tokenizer.as_target_tokenizer():
-            labels = tokenizer(data["summary"], max_length=max_target_length, truncation=True)
+            labels = tokenizer(summaries, max_length=max_target_length, truncation=True)
 
         model_inputs["labels"] = labels["input_ids"]
         return model_inputs
