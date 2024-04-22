@@ -45,5 +45,5 @@
 
 from summarization import SummarizationFineTuning
 
-summ = SummarizationFineTuning("../data/raw/summarization/samsum/")
+summ = SummarizationFineTuning("samsum")
 summ.train() 
