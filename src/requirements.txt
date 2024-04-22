@@ -4,6 +4,5 @@ nltk==3.8.1
 numpy==1.26.4
 pandas==2.2.2
 spacy==3.7.4
-torch==2.2.0+cu118
 transformers==4.37.2
 fastcoref==2.1.6
