@@ -30,16 +30,7 @@ class SummarizationFineTuning:
 
         model_inputs["labels"] = labels["input_ids"]
         return model_inputs
-    
-    # ## Load data for training
-    # def load_data_training(self):
-    #     train = load_dataset("csv", data_files=self.dataset_path+"train.csv")["train"]
-    #     val = load_dataset("csv", data_files=self.dataset_path+"validation.csv")["train"]
-    #     # train = pd.read_csv(self.dataset_path+"train.csv")
-    #     train=self.process(train)
-    #     # val=pd.read_csv(self.dataset_path+"validation.csv")
-    #     val=self.process(val)
-    #     return train,val
+   
     
     ## Compute Rouge score during validation
     def compute_metrics(self,eval_pred):
@@ -74,17 +65,17 @@ class SummarizationFineTuning:
         tokenized_dataset = self.dataset.map(self.process, batched=True)        
         # Define training args
         args = Seq2SeqTrainingArguments(
-            "dialogue-summarization", #
-            evaluation_strategy = "epoch",
-            learning_rate=2e-5,
-            per_device_train_batch_size=self.batch_size,
-            per_device_eval_batch_size=self.batch_size,
-            gradient_accumulation_steps=2,
-            weight_decay=0.01,
-            save_total_limit=2,
-            num_train_epochs=3,
-            predict_with_generate=True,
-            fp16=True,
+            "dialogue-summarization", # the name of output dir
+            evaluation_strategy = "epoch", # how often the model will be evaluated during training
+            learning_rate=2e-5, # controls the step size during training.
+            per_device_train_batch_size=self.batch_size, # determines the batch size used for training 
+            per_device_eval_batch_size=self.batch_size, # determines the batch size used for evaluation 
+            gradient_accumulation_steps=2, # It accumulates gradients over multiple steps before updating the model weights
+            weight_decay=0.01, # penalizes large weights to prevent overfitting. 
+            save_total_limit=2, # limits the total number of checkpoints to save during training
+            num_train_epochs=3, # This parameter specifies the number of epochs 
+            predict_with_generate=True, # When set to True, it indicates that the model should use generation 
+            fp16=True, # using 16-bit floating-point precision instead of the standard 32-bit.
         )
         print(self.tokenizer)
         collator = DataCollatorForSeq2Seq(self.tokenizer, model=model)
