@@ -8,7 +8,7 @@ import torch
 
 ## Class for fine-tuning the model
 class SummarizationFineTuning:
-    def __init__(self,dataset):
+    def __init__(self,dataset="samsum"):
         self.dataset= load_dataset(dataset)
         # check if dataset is valid
         if self.dataset is None:
@@ -100,4 +100,3 @@ class SummarizationFineTuning:
         summary = tokenizer.batch_decode(output, skip_special_tokens=True)[0]
         return summary
     
- 
