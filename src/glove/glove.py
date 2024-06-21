@@ -10,7 +10,7 @@ class Glove:
         # define Glove
         self.pretrained_wv = GloVe(cache=self.TORCHNLP_CACHEDIR)
     
-    def glove(self, word: str) -> torch.Tensor:
+    def word2vec(self, word: str) -> torch.Tensor:
         """
         Retrieves the word embedding vector for a given word.
 
@@ -29,7 +29,7 @@ def test():
 
         def test_glove_existing_word(self):
             word = 'king'
-            embedding = self.glove_model.glove(word)
+            embedding = self.glove_model.word2vec(word)
             self.assertIsInstance(embedding, Tensor)
             self.assertEqual(embedding.size(0), 300)  # GloVe vectors are of size 300
         

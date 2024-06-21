@@ -1,1 +1,1 @@
-from glove import *
+from .glove import Glove

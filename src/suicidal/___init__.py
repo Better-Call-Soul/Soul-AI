@@ -1,1 +1,1 @@
-from suicidal import *
+from .suicidal import Suicidal
