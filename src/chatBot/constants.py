@@ -17,7 +17,7 @@ use_nested_quant = False
 
 # TrainingArguments parameters
 output_dir = "./results"
-num_train_epochs = 2
+num_train_epochs = 1
 fp16 = False
 bf16 = False
 per_device_train_batch_size = 4

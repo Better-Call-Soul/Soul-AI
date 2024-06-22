@@ -66,12 +66,12 @@ class chatbot:
     return response
   
 
-# chat = chatbot()
+chat = chatbot()
 
-# while True:
-#     user_input = input("Prompt (press 'q' to quit): ")
-#     if user_input.lower() == 'q':
-#         break
-#     else:
-#         response = chat.predict(user_input)
-#         print("AI:", response)
+while True:
+    user_input = input("Prompt (press 'q' to quit): ")
+    if user_input.lower() == 'q':
+        break
+    else:
+        response = chat.predict(user_input)
+        print("AI:", response)

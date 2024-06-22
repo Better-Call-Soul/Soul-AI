@@ -8,7 +8,9 @@ class Evaluation:
     self.dataset = dataset
     self.sample_size = sample_size
     
-    X, y = self.dataset.map(self.extract_qa_pairs)
+    processed_dataset = self.dataset.map(self.extract_qa_pairs)
+    X = processed_dataset["input"]
+    y = processed_dataset["response"]
 
     # Get random indices
     sampled_indices = self.get_random_indices(X)
@@ -20,11 +22,11 @@ class Evaluation:
     # print("Random Samples of Inputs (random_X):", random_X[:5])
     # print("Random Samples of Responses (random_y):", random_y[:5])
 
-    
+  
   def extract_qa_pairs(self, example):
     input_text = example["text"].split("[INST]")[1].split("[/INST]")[0].strip()
     response_text = example["text"].split("[/INST]")[1].replace("</s>", "").strip()
-    return input_text, response_text
+    return {"input": input_text, "response": response_text}
   
   def get_random_indices(self, X):
     # Filter X to only include items with length < 200 tokens
@@ -33,7 +35,7 @@ class Evaluation:
     # Take a random sample from the filtered indices
     return random.sample(filtered_indices, self.sample_size)
 
-  def get_predictions(X, pipe):
+  def get_predictions(self, X, pipe):
       predictions=[]
 
       for row in tqdm(X):
@@ -89,7 +91,7 @@ class Evaluation:
     print(f'bleu score for {self.sample_size} sample = {sacrebleu_results["score"]} , score = {scores["bleu"]}')
 
 
-  def evaluate(self, model, tokenizer):
+  def evaluate_model(self, model, tokenizer):
     pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_new_tokens=256)
     predictions = self.get_predictions(self.random_X, pipe)
     self.evaluation_metrics(predictions, self.random_y)

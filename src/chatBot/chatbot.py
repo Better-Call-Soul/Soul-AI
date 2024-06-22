@@ -14,20 +14,23 @@ from eval import Evaluation
 from constants import *
 
 class Chatbot_Finetune:
-  def __init__(self, data_path, save_model=False):
+  def __init__(self, save_model=False):
     self.save_model = save_model
     self.model = None
     self.tokenizer = None
     self.trainer = None
-    self.initialize_model()
+    self.dataset = None
     
     # dataset loading 
-    self.dataset = self.load_dataset(data_path)
+    self.load_dataset()
+
+    # initialize model
+    self.initialize_model()
     
     # evaluation initialization
     self.eval = Evaluation(dataset=self.dataset, sample_size=sample_size)
 
-  def load_dataset(self, data_path):
+  def load_dataset(self):
     self.dataset = preprocess_data(
       file_name=data_path,
       col_name='text',
@@ -107,13 +110,13 @@ class Chatbot_Finetune:
     
   def train(self):
     # Evaluate the model before training
-    eval.evaluate(model=self.model, tokenizer=self.tokenizer)
+    self.eval.evaluate_model(model=self.model, tokenizer=self.tokenizer)
 
     # Train model
     self.trainer.train()
     
     # Evaluate the model after training
-    eval.evaluate(model=self.model, tokenizer=self.tokenizer)
+    self.eval.evaluate_model(model=self.model, tokenizer=self.tokenizer)
 
     if self.save_model:
       self.upload_model()
