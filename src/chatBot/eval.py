@@ -1,5 +1,5 @@
 import random
-import tqdm
+from tqdm import tqdm
 import evaluate
 from transformers import pipeline
 

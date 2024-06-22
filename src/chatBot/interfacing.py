@@ -6,7 +6,6 @@ from transformers import (
     logging,
 )
 from peft import PeftModel
-from tqdm import tqdm
 
 model_name = "NousResearch/Llama-2-7b-chat-hf"
 new_model = "Llama-2-7b-chat-finetune"
