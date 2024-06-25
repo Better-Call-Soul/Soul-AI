@@ -1,14 +1,17 @@
 # Import Required Libraries
 import json
-from sklearn.model_selection import train_test_split, learning_curve
+from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 import plotly.graph_objects as go
 import seaborn as sns
 import numpy as np
 
 from utils import *
+from constants import *
 from logistic_regression import LogisticRegressionModel
 from svc import SVCModel
+
+import joblib
 
 class Chatbot:
   def __init__(self, model, save_model=False):
@@ -23,33 +26,43 @@ class Chatbot:
     self.initialize_model(model)
     
   def load_dataset(self):
-    with open('../../../data/processed/chatbot/input.json', 'r') as f:
+    with open(data_path, 'r') as f:
       data = json.load(f)
 
     self.dataset = pd.DataFrame(data['intents'])
     print(f'data set loaded successfully, dataset size = {len(self.dataset)}')
     
   def map_dataset(self):
-    df = map_tag_pattern(self.dataset, "tag", "patterns", "responses")
-    X = df['patterns']
-    y = df['tag']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+      df = map_tag_pattern(self.dataset, tag_col, text_col, res_col)
+      X = df[text_col]
+      y = df[tag_col]
+      X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    vectorizer = TfidfVectorizer()
-    X_train_vec = vectorizer.fit_transform(X_train)
-    X_test_vec = vectorizer.transform(X_test)
-    return X_train_vec, X_test_vec, y_train, y_test
+      vectorizer = TfidfVectorizer()
+      X_train_vec = vectorizer.fit_transform(X_train)
+      X_test_vec = vectorizer.transform(X_test)
+
+      # Save the vectorizer to a file
+      joblib.dump(vectorizer, vectorizer_filename)
+
+      return X_train_vec, X_test_vec, y_train, y_test
       
   def initialize_model(self, model, get_best_params=False):
-    if model == 'logistic_regression':
+    if model == lr_model_name:
       self.model = LogisticRegressionModel(save_model=self.save_model, get_best_params = get_best_params)
-    elif model == 'svc':
+    elif model == svc_model_name:
       self.model = SVCModel(save_model=self.save_model, get_best_params = get_best_params)
 
   def train(self):
     X_train_vec, X_test_vec, y_train, y_test = self.map_dataset()
     
-    model = self.model.fit(X_train_vec, y_train)
+    self.model.fit(X_train_vec, y_train)
     y_pred, accuracy_sv, F1_sv, recall_sv, precision_sv = self.model.predict(X_test_vec, y_test)
 
     print(f'Accuracy: {accuracy_sv}, F1: {F1_sv}, Recall: {recall_sv}, Precision: {precision_sv}')
+    
+    report_classification(y_test, y_pred, filename=classification_report)
+
+
+chatbot = Chatbot('lr', save_model=True)
+chatbot.train()

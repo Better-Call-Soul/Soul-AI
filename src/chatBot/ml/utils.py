@@ -22,7 +22,7 @@ def map_tag_pattern(df, tag_col, text_col, res_col):
   return pd.DataFrame.from_dict(dic)
 
 
-def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
+def plot_learning_curve(estimator, title, X, y, filename=None, ylim=None, cv=None, n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
     plt.figure()
     plt.title(title)
     if ylim is not None:
@@ -45,12 +45,15 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=None,
     plt.plot(train_sizes, test_scores_mean, 'o-', color="g", label="Cross-validation score")
 
     plt.legend(loc="best")
+    
+    plt.savefig(filename)
+
     plt.show()
     return plt
 
 
 # Confusion Matrix
-def confusion_matrix_sklearn(predictions, target):
+def confusion_matrix_sklearn(predictions, target, filename=None):
     class_names = np.unique(np.concatenate((predictions, target)))
     cm = confusion_matrix(target, predictions)
 
@@ -58,9 +61,10 @@ def confusion_matrix_sklearn(predictions, target):
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
+    plt.savefig(filename)
     
 
-def report_classification(y_test, y_pred):
+def report_classification(y_test, y_pred, filename=None):
     report = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
 
     report = {label: {metric: report[label][metric] for metric in report[label]} for label in report if isinstance(report[label], dict)}
@@ -79,3 +83,5 @@ def report_classification(y_test, y_pred):
                       barmode='group')
 
     fig.show()
+    fig.write_image(filename)
+    

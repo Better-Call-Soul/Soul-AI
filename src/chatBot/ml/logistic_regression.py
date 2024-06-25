@@ -4,6 +4,7 @@ from sklearn.metrics import recall_score,precision_score,f1_score,accuracy_score
 import joblib
 
 from utils import *
+from constants import *
 
 class LogisticRegressionModel:
 
@@ -45,12 +46,11 @@ class LogisticRegressionModel:
 
     self.model.fit(X_train, y_train)
 
-    plot_learning_curve(self.model, "Learning Curve (Logistice Regression)", X_train, y_train, cv=5)
+    plot_learning_curve(self.model, "Learning Curve (Logistice Regression)", X_train, y_train, cv=5, filename=lr_learning_curve)
 
     if self.save_model:
-      joblib.dump(self.model, '../../../models/chatbot/ml/lr.pkl')
+      joblib.dump(self.model, lr_model)
 
-    return self.model
 
   def predict(self, X_test, y_test):
     y_pred = self.model.predict(X_test)
@@ -60,7 +60,7 @@ class LogisticRegressionModel:
     recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
     precision = precision_score(y_test, y_pred, average='macro', zero_division=0)
 
-    confusion_matrix_sklearn(y_pred, y_test)
+    confusion_matrix_sklearn(y_pred, y_test, filename=lr_confusion_matrix)
 
     return y_pred, accuracy, F1, recall, precision
   
