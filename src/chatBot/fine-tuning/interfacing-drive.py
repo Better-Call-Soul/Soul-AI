@@ -46,13 +46,24 @@ class chatbot:
                     # max_length=200
                     )
     
+  # def get_prompt(self, input):
+  #   return f"""<s>[INST]
+  #       instructions: {self.instructions}
+  #       conversation history:
+  #       {self.history}
+  #       input:
+  #       {input} [/INST]"""
+  
   def get_prompt(self, input):
-    return f"""<s>[INST]
+    return f"""<s>[INST] <<SYS>>
         instructions: {self.instructions}
-        conversation history:
+        <</SYS>>
+        Current conversation:
         {self.history}
-        input:
-        {input} [/INST]"""
+        Human: {input}
+        AI: [/INST]"""
+        #         input:
+        # {input} [/INST]
 
   def predict(self, input):
     # print(self.get_prompt(input))
