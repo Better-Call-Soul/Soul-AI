@@ -14,7 +14,6 @@ device_map = {"": 0}
 
 class chatbot:
   def __init__(self):
-    self.history = ''
     self.instructions = 'you are a therapist, ask a question and be concise'
     self.pipe = self.load_pipeline()
     
@@ -46,43 +45,41 @@ class chatbot:
                     # max_length=200
                     )
     
-  # def get_prompt(self, input):
+  # def get_prompt(self, input, history):
   #   return f"""<s>[INST]
   #       instructions: {self.instructions}
   #       conversation history:
-  #       {self.history}
+  #       {history}
   #       input:
   #       {input} [/INST]"""
   
-  def get_prompt(self, input):
+  def get_prompt(self, input, history):
     return f"""<s>[INST] <<SYS>>
         instructions: {self.instructions}
         <</SYS>>
         Current conversation:
-        {self.history}
+        {history}
         Human: {input}
         AI: [/INST]"""
         #         input:
         # {input} [/INST]
 
-  def predict(self, input):
-    # print(self.get_prompt(input))
-    result = self.pipe(self.get_prompt(input))
+  def predict(self, input, history):
+    # print(self.get_prompt(input, history))
+    result = self.pipe(self.get_prompt(input, history))
     response = result[0]['generated_text'].split("[/INST]")[-1].strip()
-    self.history += f'''
-        User: {input}
-        Ai: {response}
-        '''
 
     return response
   
 
 chat = chatbot()
 
+history = ""
 while True:
     user_input = input("Prompt (press 'q' to quit): ")
     if user_input.lower() == 'q':
         break
     else:
-        response = chat.predict(user_input)
+        response = chat.predict(user_input, history)
+        history += f"Human: {user_input}\nAI: {response}\n"
         print("AI:", response)
