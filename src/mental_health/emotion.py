@@ -57,7 +57,7 @@ class Emotion:
                 embedding_size=300,
                 lstm_hidden_size=500,
                 hidden_layer_size=512,
-                epochs=1,
+                epochs=100,
                 num_classes=7,
                 learning_rate=0.001,
                 word2vec=Glove(),
@@ -607,6 +607,36 @@ class Emotion:
                 print(f"{class_name}: {probability}")
             print('----------------------------------------------')
 
+    def loop_mode(self):
+        # Load the trained model
+        model = Model(self.embedding_size, self.lstm_hidden_size, self.hidden_layer_size).to(self.DEVICE)
+        model.load_state_dict(torch.load(self.model_save_path, map_location=self.DEVICE))
+        model.eval()
+        model.to(self.DEVICE)
+        while True:
+            exit_key = input("Enter q to exit eles to continue: ")
+            if exit_key == 'q':
+                break
+            i = 0
+            dialogue = []
+            while True:
+                txt = 'user1: ' if i == 0 else 'user2: '
+                dialogue.append(input(f"{txt}"))
+                print('enter q to finish dialogue or continue the chat...')
+                if dialogue[-1] == 'q':
+                    dialogue.pop()
+                    break
+                i = 1 - i
+            predicted_class_names, class_probabilities = self.emotion_detection(dialogue, model)
+            for sentence, predicted_class_name, probs in zip(dialogue, predicted_class_names, class_probabilities):
+                print(f"Sentence: {sentence}")
+                print(f"Predicted class: {predicted_class_name}")
+                print()
+                print("Class probabilities:")
+                for class_name, probability in probs.items():
+                    print(f"{class_name}: {probability}")
+                print('----------------------------------------------')
+
 
 print('finished loading class')
 
@@ -616,6 +646,7 @@ if __name__ == '__main__':
             Choose the mode you want to operate...
             1. Train Mode
             2. Production Mode
+            3. loop model
             else to exit
             ''')
         mode = input("Enter your choice: ")
@@ -625,6 +656,9 @@ if __name__ == '__main__':
         elif mode == '2':
             emotion_model = Emotion()
             emotion_model.prod_mode()
+        elif mode == '3':
+            emotion_model = Emotion()
+            emotion_model.loop_mode()
         else:
             print('Exit...')
             exit()
