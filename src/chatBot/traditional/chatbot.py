@@ -22,6 +22,13 @@ class Chatbot:
         self.dataset = map_tag_pattern(df, tag_col, text_col, res_col)
 
     def respond(self, text):
+        '''
+        Respond to the user input
+        :param text: The user input
+        :type text: str
+        :return: The response to the user input
+        :rtype: str
+        '''
         maximum = float('-inf')
         responses = []
         for i in self.dataset.iterrows():
@@ -33,11 +40,13 @@ class Chatbot:
                 closest = i[1][text_col]
         return response
 
-chatbot = Chatbot()
+if __name__ == "__main__":
+    
+    chatbot = Chatbot()
 
-while True:
-    text = str(input("Input: (press 'q' to quit) "))
-    if text.lower() == "q":
-        print("Response: Exiting.....")
-        break
-    print("Response:", chatbot.respond(text))
+    while True:
+        text = str(input("Input: (press 'q' to quit) "))
+        if text.lower() == "q":
+            print("Response: Exiting.....")
+            break
+        print("Response:", chatbot.respond(text))

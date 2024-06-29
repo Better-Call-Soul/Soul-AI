@@ -9,7 +9,12 @@ from constants import *
 class SVCModel:
 
   def __init__(self, save_model = False, get_best_params = False):
-
+    '''
+    Initialize the model
+    Args:
+      save_model (bool): Whether to save the model or not
+      get_best_params (bool): Whether to get the best parameters or not
+    '''
     self.param_grid = {
         'C':[1, 10, 100],
         'gamma':[1, 0.1, 0.001],
@@ -23,6 +28,13 @@ class SVCModel:
 
 
   def grid_seaarch(self, X_train, y_train):
+    '''
+    Perform grid search to get the best parameters
+    Args:
+      X_train (DataFrame): The training data
+      y_train (DataFrame): The training labels
+    '''
+    
     # we sample 10k of the dataset to grid search the SVC due to high computatuin time
     np.random.seed(0)
     random_indices = np.random.choice(X_train.shape[0], 10000, replace=False)
@@ -38,6 +50,12 @@ class SVCModel:
 
 
   def fit(self, X_train, y_train):
+    '''
+    Fit the model
+    Args:
+      X_train (DataFrame): The training data
+      y_train (DataFrame): The training labels
+    '''
 
     if self.get_best_params:
         self.grid_seaarch(X_train, y_train)
@@ -58,6 +76,18 @@ class SVCModel:
 
 
   def predict(self, X_test, y_test):
+    '''
+    Predict the labels
+    Args:
+      X_test (DataFrame): The testing data
+      y_test (DataFrame): The testing labels
+    Returns:
+      y_pred (DataFrame): The predicted labels
+      accuracy (float): The accuracy of the model
+      F1 (float): The F1 score of the model
+      recall (float): The recall of the model
+      precision (float): The precision of the model
+    '''
     y_pred = self.model.predict(X_test)
 
     accuracy = accuracy_score(y_test, y_pred)

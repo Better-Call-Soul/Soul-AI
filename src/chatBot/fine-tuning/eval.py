@@ -5,6 +5,13 @@ from transformers import pipeline
 
 class Evaluation:
   def __init__(self, dataset, sample_size=4):
+    '''
+    Initialize the dataset and sample size
+    :param dataset: The dataset to evaluate
+    :type dataset: Dataset
+    :param sample_size: The number of samples to evaluate
+    :type sample_size: int
+    '''
     self.dataset = dataset
     self.sample_size = sample_size
     
@@ -24,11 +31,25 @@ class Evaluation:
 
   
   def extract_qa_pairs(self, example):
+    '''
+    Extract the input and response from the example
+    :param example: The example to extract the input and response from
+    :type example: dict
+    :return: The input and response
+    :rtype: dict
+    '''
     input_text = example["text"].split("[INST]")[1].split("[/INST]")[0].strip()
     response_text = example["text"].split("[/INST]")[1].replace("</s>", "").strip()
     return {"input": input_text, "response": response_text}
   
   def get_random_indices(self, X):
+    '''
+    Get random indices from the dataset
+    :param X: The input data
+    :type X: list
+    :return: The random indices
+    :rtype: list
+    '''
     # Filter X to only include items with length < 200 tokens
     filtered_indices = [i for i, x in enumerate(X) if len(x) < 200]
 
@@ -36,6 +57,15 @@ class Evaluation:
     return random.sample(filtered_indices, self.sample_size)
 
   def get_predictions(self, X, pipe):
+      '''
+      Get the predictions for the input data
+      :param X: The input data
+      :type X: list
+      :param pipe: The pipeline to generate the predictions
+      :type pipe: pipeline
+      :return: The predictions
+      :rtype: list
+      '''
       predictions=[]
 
       for row in tqdm(X):
@@ -82,6 +112,13 @@ class Evaluation:
       return predictions
   
   def evaluation_metrics(self, predictions, random_y):
+    '''
+    Evaluate the model using BLEU score
+    :param predictions: The predicted responses
+    :type predictions: list
+    :param random_y: The actual responses
+    :type random_y: list
+    '''
     sacrebleu = evaluate.load("sacrebleu")
     sacrebleu_results=sacrebleu.compute(predictions=predictions, references=random_y)
 
@@ -92,6 +129,13 @@ class Evaluation:
 
 
   def evaluate_model(self, model, tokenizer):
+    '''
+    Evaluate the model using BLEU score
+    :param model: The model to evaluate
+    :type model: model
+    :param tokenizer: The tokenizer to use
+    :type tokenizer: tokenizer
+    '''
     pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_new_tokens=256)
     predictions = self.get_predictions(self.random_X, pipe)
     self.evaluation_metrics(predictions, self.random_y)

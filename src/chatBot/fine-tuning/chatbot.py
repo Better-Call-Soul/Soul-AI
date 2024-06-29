@@ -15,6 +15,9 @@ from constants import *
 
 class Chatbot_Finetune:
   def __init__(self, save_model=False):
+    '''
+    Load the dataset, initialize the model, and define the evaluation class
+    '''
     self.save_model = save_model
     self.model = None
     self.tokenizer = None
@@ -31,6 +34,9 @@ class Chatbot_Finetune:
     self.eval = Evaluation(dataset=self.dataset, sample_size=sample_size)
 
   def load_dataset(self):
+    '''
+    Load the dataset
+    '''
     self.dataset = preprocess_data(
       file_name=data_path,
       col_name='text',
@@ -40,6 +46,9 @@ class Chatbot_Finetune:
     print(f'data set loaded successfully, dataset size = {len(self.dataset)}')
     
   def initialize_model(self):
+    '''
+    Initialize the model, tokenizer, and training arguments
+    '''
     # Load tokenizer and model with QLoRA configuration
     compute_dtype = getattr(torch, bnb_4bit_compute_dtype)
 

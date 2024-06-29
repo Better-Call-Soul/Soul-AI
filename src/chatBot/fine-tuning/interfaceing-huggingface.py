@@ -17,6 +17,11 @@ class chatbot:
     self.pipe = self.load_pipeline()
     
   def load_pipeline(self):
+    '''
+    Load the pipeline for text generation
+    :return: The pipeline
+    :rtype: pipeline
+    '''
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     model = AutoModelForCausalLM.from_pretrained(
         model_path,
@@ -46,6 +51,15 @@ class chatbot:
   #       {input} [/INST]"""    
 
   def get_prompt(self, input, history):
+    '''
+    Get the prompt for the model
+    :param input: The input
+    :type input: str
+    :param history: The conversation history
+    :type history: str
+    :return: The prompt
+    :rtype: str
+    '''
     return f"""<s>[INST] <<SYS>>
         instructions: {self.instructions}
         <</SYS>>
@@ -57,19 +71,30 @@ class chatbot:
         # {input} [/INST]
 
   def predict(self, input, history):
+    '''
+    Predict the response for the user input
+    :param input: The user input
+    :type input: str
+    :param history: The conversation history
+    :type history: str
+    :return: The response
+    :rtype: str
+    '''
     # print(self.get_prompt(input, history))
     result = self.pipe(self.get_prompt(input, history))
     response = result[0]['generated_text'].split("[/INST]")[-1].strip()
     return response
   
-chat = chatbot()
+if __name__ == '__main__':
+      
+  chat = chatbot()
 
-history = ""
-while True:
-    user_input = input("Prompt (press 'q' to quit): ")
-    if user_input.lower() == 'q':
-        break
-    else:
-        response = chat.predict(user_input, history)
-        history += f"Human: {user_input}\nAI: {response}\n"
-        print("AI:", response)
+  history = ""
+  while True:
+      user_input = input("Prompt (press 'q' to quit): ")
+      if user_input.lower() == 'q':
+          break
+      else:
+          response = chat.predict(user_input, history)
+          history += f"Human: {user_input}\nAI: {response}\n"
+          print("AI:", response)
