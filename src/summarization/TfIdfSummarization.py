@@ -2,39 +2,43 @@ import re
 import math
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from preprocessing.preprocessing import Preprocessing
-from preprocessing.fastcoref import Fastcoref
-from preprocessing.capitalize import Capitalize
+from preprocess.preprocess import Preprocessor
+from preprocess.fastcoref import Fastcoref
+from preprocess.capitalize import Capitalize
 
 # Class for machine learning based summarization of text using tf-idf algorithm
 class TfIdfSummarization:
     def __init__(self,threshold=0.9):
         self.threshold=threshold
-        self.preprocess=Preprocessing()
+        self.preprocess=Preprocessor()
         self.fastcoref=Fastcoref()
         self.capitalize=Capitalize()
-
+        self.originalStatements = None
     # Clean the text
-    def clean_text(self,text):
+    def clean_text(self,text:str) -> list[str]:
         text=self.fastcoref.coreference_resolution(text)
         statements = re.findall(r'[^.!?]+[.!?]', text)
+        self.originalStatements = statements
         sentences =[]
-        # remove non-english characters and extra whitespaces
+        # preprocessing steps:
         for sentence in statements:
-            sentence=self.preprocess.preprocess_text([sentence])[0]
+            sentence=self.preprocess.clean(sentence,
+            ["lower_sentence","remove_emojis","remove_emoticons","remove_nonascii_diacritic","remove_emails","clean_html",
+            "remove_url","replace_repeated_chars","expand_sentence","remove_extra_space","tokenize_sentence","check_sentence_spelling","detokenize_sentence"]
+            ,"")[0]
             sentences.append(sentence)
 
         return sentences
     
     # Count the number of words in the text
-    def count_words(self,text):
+    def count_words(self,text:str) -> int:
         # Tokenize the text
         words = word_tokenize(text)
         words=[word for word in words if word not in  stopwords.words('english')] # remove non-alphabetic characters
         return len(words)
     
     # Count the number of words in each sentence
-    def count_in_sentences(self, sentences):
+    def count_in_sentences(self, sentences:list[str]) -> list[dict[str,int]]:
         count=[]
         for i,sentence in enumerate(sentences):
             temp={'id':i,'word_count':self.count_words(sentence[:-1])}
@@ -44,7 +48,7 @@ class TfIdfSummarization:
 
     
     # Create a frequency dictionary for each word of the sentence
-    def freq_dict(self,sentences):
+    def freq_dict(self,sentences : list[str])  -> list[dict[int,dict[str,int]]]:
         freq_list=[]
         for i,sentence in enumerate(sentences):
             words = word_tokenize(sentence[:-1]) # tokenize the sentence
@@ -63,7 +67,7 @@ class TfIdfSummarization:
         return freq_list
 
     # Calculates the term frequency of words in each sentence
-    def tf(self,text,freq_list):
+    def tf(self,text,freq_list : list[dict[int,dict[str,int]]]) -> list[dict[int,str,float]]:
         tf_list=[]
         for freq in freq_list:
             id=freq['id']
@@ -76,7 +80,7 @@ class TfIdfSummarization:
         return tf_list
     
     # Calculates the inverse document frequency of words in the text
-    def idf(self,text,freq_list):
+    def idf(self,text,freq_list: list[dict[int,dict[str,int]]]) -> list[dict[int,str,float]]:
         idf_list=[]
         for freq in freq_list:# loop for each sentence
             id=freq['id']
@@ -88,7 +92,7 @@ class TfIdfSummarization:
         return idf_list
     
     # Calculate the tf-idf of words in the text
-    def calc_tf_idf(self,tf_list,idf_list):
+    def calc_tf_idf(self,tf_list,idf_list : list[dict[int,str,float]]) -> list[dict[int,str,float]]:
         tf_idf_list=[]
         for tf in tf_list:
             for idf in idf_list:
@@ -99,7 +103,7 @@ class TfIdfSummarization:
         return tf_idf_list
     
     # Score the sentences based on the tf-idf of the words
-    def score_sentences(self,sentences,tf_idf_list,text):
+    def score_sentences(self,sentences: list[str],tf_idf_list:list[dict[int,str,float]] ,text : list[dict[int,str,int]]) -> list[dict[int,float,str]]:
         sent_data=[]
         # loop for each sentence
         for txt in text:
@@ -109,12 +113,13 @@ class TfIdfSummarization:
                 if(tf_idf['id']==id):
                     score+=tf_idf['tf_idf']
             # store the sentence id, score and the sentence
-            temp={'id':id,'score':score,'sentence':sentences[id]}
+            temp={'id':id,'score':score,'sentence':sentences[id],
+                "original_sentence":self.originalStatements[id].strip()}
             sent_data.append(temp)
         return sent_data
 
     # Calculate the best number of sentences for the summary
-    def best_num_sentences(self,sentences):
+    def best_num_sentences(self,sentences: list[str]) -> int:
         # if the number of sentences is less than or equal to 3 then return the number of sentences
         if len(sentences) <= 3:
             return len(sentences)
@@ -122,7 +127,7 @@ class TfIdfSummarization:
         return round(1.3 * math.log(len(sentences)))
     
     # Rank the sentences based on the score
-    def rank_sentence_by_avg(self, data):
+    def rank_sentence_by_avg(self, data: list[dict[int,float,str]]) -> str:
         count=0
         summary=[]
         # calculate the average score of the sentences
@@ -131,13 +136,13 @@ class TfIdfSummarization:
         avg=count/len(data) # average score
         threshold_score = avg * self.threshold
         # loop for each sentence
-        summary = [item['sentence'] for item in data if item['score'] >= threshold_score]
+        summary = [item['original_sentence'] for item in data if item['score'] >= threshold_score]
 
         summary=" ".join(summary)
         return summary
 
     # Get the top sentences based on the score and limit by the best number of sentences
-    def get_top_sentences(self,data):
+    def get_top_sentences(self,data: list[dict[int,float,str]]) -> str:
         # sort the sentences based on the score
         data.sort(key=lambda x: x['score'], reverse=True)
         # get the best number of sentences for the summary
@@ -145,13 +150,13 @@ class TfIdfSummarization:
         # get the top sentences
         top_sentences=data[:best_num]
         # loop for each sentence
-        summary = [item['sentence'] for item in top_sentences]
+        summary = [item['original_sentence'] for item in top_sentences]
         
         summary=" ".join(summary)
         return summary
     
     # Generate the summary
-    def summary(self,text_input):
+    def summary(self,text_input: str) -> str:
         # step1: clean the text
         sentences=self.clean_text(text_input)
         # step2: count the number of words in the text

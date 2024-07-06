@@ -35,7 +35,7 @@ class Preprocessing:
 
         return text
 
-    def remove_emoticons(self,text):
+    def remove_emoticons(self,text ):
         # Define a regular expression pattern to match emoticons
         emoticon_pattern = re.compile(r':(\)+)|:-(\))+|;(\))+|:-(D)+|:(D)+|;-(D)+|x(D)+|X(D)+|:-(\()+|:(\()+|:-(/)+|:(/)+|:-(\))+||:(\))+||:-(O)+|:(O)+|:-(\*)+|:(\*)+|<(3)+|:(P)+|:-(P)+|;(P)+|;-(P)+|:(S)+|>:(O)+|8(\))+|B-(\))+|O:(\))+', flags=re.IGNORECASE)
         # Remove emoticons using the pattern
