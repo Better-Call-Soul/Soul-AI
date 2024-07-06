@@ -52,6 +52,8 @@ class TfIdfSummarization:
         freq_list=[]
         for i,sentence in enumerate(sentences):
             words = word_tokenize(sentence[:-1]) # tokenize the sentence
+            # lemmatize the words
+            words=self.preprocess.lemm_sentence(words)
             freq_dict = {}
             for word in words:
                 if(word in stopwords.words('english')): # remove stop words
@@ -149,6 +151,8 @@ class TfIdfSummarization:
         best_num=self.best_num_sentences(data)
         # get the top sentences
         top_sentences=data[:best_num]
+        # sort by id
+        top_sentences.sort(key=lambda x: x['id'])
         # loop for each sentence
         summary = [item['original_sentence'] for item in top_sentences]
         

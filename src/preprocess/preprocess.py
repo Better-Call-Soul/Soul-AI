@@ -270,7 +270,7 @@ class Preprocessor:
 
     def remove_emoticons(self,text:str) -> str:
         '''
-        Removes specific patterns and emoticons from the given text.
+        Removes specific patterns like[:) | :(] and emoticons from the given text.
         :type text: list[str]
         :return: Text without emoticons.
         :rtype: str
