@@ -62,7 +62,8 @@ class SummarizationFineTuning:
         self.max_input_length=max_input_length
         self.max_target_length=max_target_length
         self.batch_size=batch_size
-        tokenized_dataset = self.dataset.map(self.process, batched=True)        
+        tokenized_dataset = self.dataset.map(self.process, batched=True)   
+             
         # Define training args
         args = Seq2SeqTrainingArguments(
             "dialogue-summarization", # the name of output dir
@@ -77,6 +78,7 @@ class SummarizationFineTuning:
             predict_with_generate=True, # When set to True, it indicates that the model should use generation 
             fp16=True, # using 16-bit floating-point precision instead of the standard 32-bit.
         )
+        
         print(self.tokenizer)
         collator = DataCollatorForSeq2Seq(self.tokenizer, model=model)
         trainer = Seq2SeqTrainer(
