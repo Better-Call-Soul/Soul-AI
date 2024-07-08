@@ -489,6 +489,30 @@ class Suicidal:
                 print(f"{class_name}: {probability}")
             print('----------------------------------------------')
 
+    def loop_mode(self):
+        # Load the trained model
+        model = Model(self.embedding_size, self.lstm_hidden_size, self.hidden_layer_size,
+                    self.cnn_layer_size, self.class_layer)
+        model.load_state_dict(torch.load(self.model_save_path, map_location=self.DEVICE))
+        model.eval()
+        model.to(self.DEVICE)
+        model = model.to(self.DEVICE)
+        while True:
+            exit_key = input("Enter q to exit eles to continue: ")
+            if exit_key == 'q':
+                break
+            sentence = input("Enter the sentence: ")
+            predicted_class_name, class_probabilities = self.suicidal_detection(
+                sentence, model)
+            print(f"Sentence: {sentence}")
+            print(f"Predicted class: {predicted_class_name}")
+            print()
+            print("Class probabilities:")
+            for class_name, probability in class_probabilities.items():
+                print(f"{class_name}: {probability}")
+            print('----------------------------------------------')
+
+
 print('finished loading class')
 
 if __name__ == '__main__':
@@ -496,7 +520,9 @@ if __name__ == '__main__':
         print('''
             Choose the mode you want to operate...
             1. Train Mode
-            2. Production Mode
+            2. Test Mode
+            3. Production Mode
+            3. Loop Mode
             else to exit
             ''')
         mode = input("Enter your choice: ")
@@ -505,7 +531,13 @@ if __name__ == '__main__':
             suicidal_model.dev_mode()
         elif mode == '2':
             suicidal_model = Suicidal()
+            suicidal_model.dev_mode()
+        elif mode == '3':
+            suicidal_model = Suicidal()
             suicidal_model.prod_mode()
+        elif mode == '4':
+            suicidal_model = Suicidal()
+            suicidal_model.loop_mode()
         else:
             print('Exit...')
             exit()
