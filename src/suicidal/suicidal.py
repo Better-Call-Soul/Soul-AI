@@ -34,8 +34,8 @@ class Suicidal:
                 isTrain=False,
                 split_seed=10,
                 seed=2,
-                model_name='model_1E_test',
-                batch_size=64,
+                model_name='model_20E_round_new_f2',
+                batch_size=16,
                 embedding_size=300,
                 lstm_hidden_size=20,
                 hidden_layer_size=256,
@@ -522,7 +522,7 @@ if __name__ == '__main__':
             1. Train Mode
             2. Test Mode
             3. Production Mode
-            3. Loop Mode
+            4. Loop Mode
             else to exit
             ''')
         mode = input("Enter your choice: ")
