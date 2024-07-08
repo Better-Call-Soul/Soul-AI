@@ -55,6 +55,18 @@ class TextRank:
         text=self.fastcoref.coreference_resolution(text)
         # split the text into sentences and preprocess each sentence
         statements = re.findall(r'[^.!?]+[.!?]', text)
+        # use a set to track seen statements and a list to store unique statements
+        seen_statements = set()
+        unique_statements = []
+        # iterate through each statement
+        for statement in statements:
+            # remove leading/trailing whitespace and convert to lowercase for comparison
+            clean_statement = statement.strip().lower()
+            # if the statement is not already seen, add to unique list and seen set
+            if clean_statement not in seen_statements:
+                unique_statements.append(statement.strip())
+                seen_statements.add(clean_statement)
+        statements=unique_statements
         self.org_sentences =  [statement.strip() for statement in statements]
         # preprocessing steps:
         # print("statements",statements)

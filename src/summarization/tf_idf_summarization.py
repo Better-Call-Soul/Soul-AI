@@ -19,6 +19,19 @@ class TfIdfSummarization:
     def clean_text(self,text:str) -> list[str]:
         text=self.fastcoref.coreference_resolution(text)
         statements = re.findall(r'[^.!?]+[.!?]', text)
+        # use a set to track seen statements and a list to store unique statements
+        seen_statements = set()
+        unique_statements = []
+        # iterate through each statement
+        for statement in statements:
+            # remove leading/trailing whitespace and convert to lowercase for comparison
+            clean_statement = statement.strip().lower()
+            # if the statement is not already seen, add to unique list and seen set
+            if clean_statement not in seen_statements:
+                unique_statements.append(statement.strip())
+                seen_statements.add(clean_statement)
+        statements=unique_statements
+        
         self.originalStatements = statements
         sentences =[]
         # preprocessing steps:
