@@ -14,6 +14,7 @@ class TfIdfSummarization:
         self.fastcoref=Fastcoref()
         self.capitalize=Capitalize()
         self.originalStatements = None
+        
     # Clean the text
     def clean_text(self,text:str) -> list[str]:
         text=self.fastcoref.coreference_resolution(text)
@@ -21,22 +22,24 @@ class TfIdfSummarization:
         self.originalStatements = statements
         sentences =[]
         # preprocessing steps:
+        # print("statements",statements)
         for sentence in statements:
             sentence=self.preprocess.clean(sentence,
             ["lower_sentence","remove_emojis","remove_emoticons","remove_nonascii_diacritic",
             "remove_emails","clean_html",
-            "remove_url","replace_repeated_chars","expand_sentence",
+            "remove_url","replace_repeated_chars","expand_sentence","remove_non_alphabetic",
             "remove_extra_space","tokenize_sentence","check_sentence_spelling","detokenize_sentence"]
             ,"")[0]
             sentences.append(sentence)
-
+        # print("sentence",sentences)
         return sentences
     
     # Count the number of words in the text
     def count_words(self,text:str) -> int:
         # Tokenize the text
         words = word_tokenize(text)
-        words=[word for word in words if word not in  stopwords.words('english')] # remove non-alphabetic characters
+        # remove non-alphabetic characters
+        # words=[word for word in words if word not in  stopwords.words('english')] 
         return len(words)
     
     # Count the number of words in each sentence
@@ -46,14 +49,12 @@ class TfIdfSummarization:
             temp={'id':i,'word_count':self.count_words(sentence[:-1])}
             count.append(temp)
         return count
-    
 
-    
     # Create a frequency dictionary for each word of the sentence
     def freq_dict(self,sentences : list[str])  -> list[dict[int,dict[str,int]]]:
         freq_list=[]
         for i,sentence in enumerate(sentences):
-            words = word_tokenize(sentence[:-1]) # tokenize the sentence
+            words = word_tokenize(sentence) # tokenize the sentence
             # lemmatize the words
             words=self.preprocess.lemm_sentence(words)
             freq_dict = {}

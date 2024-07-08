@@ -155,7 +155,7 @@ class Preprocessor:
         '''
         return re.sub(r'\s+', ' ', sentence).strip()
 
-
+    
     def check_sentence_spelling(self, sentence: list[str]) -> list[str]:
         '''
         Check the spelling of the words in the sentence.
@@ -280,6 +280,15 @@ class Preprocessor:
         # Remove emoticons using the pattern
         return emoticon_pattern.sub('', text)
     
+    def remove_non_alphabetic(self,text:str) -> str:
+        '''
+        Removes non-alphabetic characters from the given text.
+        :type text: str
+        :return: Text without non-alphabetic characters.
+        :rtype: str
+        '''
+        cleaned_text = re.sub(r'\W+', ' ', text)
+        return cleaned_text
     
     def clean(self, line: str, steps: list[str] = None, empty: str ='Normal') -> list[str]:
         '''
@@ -331,7 +340,8 @@ class Preprocessor:
             'lemm_sentence': self.lemm_sentence,
             'detokenize_sentence': self.detokenize_sentence,
             'remove_emojis': self.remove_emojis,
-            'remove_emoticons': self.remove_emoticons
+            'remove_emoticons': self.remove_emoticons,
+            'remove_non_alphabetic': self.remove_non_alphabetic
         }
         
         # Apply the specified steps

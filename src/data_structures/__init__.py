@@ -1,1 +1,1 @@
-from .vertex import Vertex
+from .node import Node
