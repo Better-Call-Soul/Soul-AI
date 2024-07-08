@@ -6,8 +6,10 @@ from preprocess.preprocess import Preprocessor
 from preprocess.fastcoref import Fastcoref
 from preprocess.capitalize import Capitalize
 
+
+
 # Class for machine learning based summarization of text using tf-idf algorithm
-class TfIdfSummarization:
+class TextRankSummarization:
     def __init__(self,threshold=0.9):
         self.threshold=threshold
         self.preprocess=Preprocessor()
@@ -23,8 +25,10 @@ class TfIdfSummarization:
         # preprocessing steps:
         for sentence in statements:
             sentence=self.preprocess.clean(sentence,
-            ["lower_sentence","remove_emojis","remove_emoticons","remove_nonascii_diacritic","remove_emails","clean_html",
-            "remove_url","replace_repeated_chars","expand_sentence","remove_extra_space","tokenize_sentence","check_sentence_spelling","detokenize_sentence"]
+            ["lower_sentence","remove_emojis","remove_emoticons","remove_nonascii_diacritic",
+            "remove_emails","clean_html",
+            "remove_url","replace_repeated_chars","expand_sentence",
+            "remove_extra_space","tokenize_sentence","check_sentence_spelling","detokenize_sentence"]
             ,"")[0]
             sentences.append(sentence)
 
@@ -69,7 +73,7 @@ class TfIdfSummarization:
         return freq_list
 
     # Calculates the term frequency of words in each sentence
-    def tf(self,text,freq_list : list[dict[int,dict[str,int]]]) -> list[dict[int,str,float]]:
+    def tf(self,text:list[dict[str,int]],freq_list : list[dict[int,dict[str,int]]]) -> list[dict[int,str,float]]:
         tf_list=[]
         for freq in freq_list:
             id=freq['id']
@@ -82,7 +86,7 @@ class TfIdfSummarization:
         return tf_list
     
     # Calculates the inverse document frequency of words in the text
-    def idf(self,text,freq_list: list[dict[int,dict[str,int]]]) -> list[dict[int,str,float]]:
+    def idf(self,text:list[dict[str,int]] ,freq_list: list[dict[int,dict[str,int]]]) -> list[dict[int,str,float]]:
         idf_list=[]
         for freq in freq_list:# loop for each sentence
             id=freq['id']
@@ -182,6 +186,3 @@ class TfIdfSummarization:
         summary=self.capitalize.capitalize(summary)
         return summary
     
-# if(__name__ == "__main__"):
-#     summ=MachineLearningSummarization()
-#     print(summ.summary("The cat isn't in the box. The cat likes the box. The box is in the house. The house is in the city. The city is in the country. The country is in the world."))

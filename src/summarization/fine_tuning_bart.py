@@ -7,7 +7,7 @@ from datasets import load_metric,load_dataset
 import torch
 
 ## Class for fine-tuning the model
-class SummarizationFineTuning:
+class FineTuningSummarization:
     def __init__(self,dataset="samsum"):
         self.dataset= load_dataset(dataset)
         # check if dataset is valid
