@@ -4,6 +4,7 @@ from nltk import download
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk import pos_tag
+from nltk.tokenize.treebank import TreebankWordDetokenizer
 import contractions
 import unicodedata
 from bs4 import BeautifulSoup
@@ -154,7 +155,7 @@ class Preprocessor:
         '''
         return re.sub(r'\s+', ' ', sentence).strip()
 
-
+    
     def check_sentence_spelling(self, sentence: list[str]) -> list[str]:
         '''
         Check the spelling of the words in the sentence.
@@ -227,7 +228,69 @@ class Preprocessor:
             lemmatized_words.append(lemma)
         return lemmatized_words
     
-    def clean(self, line: str, steps: list[str] = None) -> list[str]:
+    def detokenize_sentence(self, sentence: list[str]) -> str:
+        '''
+        Detokenize the sentence.
+        :param sentence: The sentence to detokenize.
+        :type sentence: list[str]
+        :return: The detokenized sentence.
+        :rtype: str
+        '''
+        return TreebankWordDetokenizer().detokenize(sentence)
+    
+    def remove_emojis(self,text:str) -> str:
+        '''
+        Removes specific patterns like (😃,🚀) and emojis from the given text.
+        :type text: list[str]
+        :return: Text without emojis.
+        :rtype: str
+        '''
+        emoji_pattern = re.compile("["
+                u"\U0001F600-\U0001F64F"  # emoticons
+                u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                u"\U00002500-\U00002BEF"  # chinese char
+                u"\U00002700-\U000027BF"  # Dingbats
+                u"\U00002702-\U000027B0"
+                u"\U000024C2-\U0001F251"
+                u"\U0001f926-\U0001f937"
+                u"\U00010000-\U0010ffff"
+                u"\u2640-\u2642"
+                u"\u2600-\u2B55"
+                u"\u200d"
+                u"\u23cf"
+                u"\u23e9"
+                u"\u231a"
+                u"\u3030"
+                "]+", flags=re.UNICODE)
+        text = emoji_pattern.sub(r'', text)
+
+        return text
+
+    def remove_emoticons(self,text:str) -> str:
+        '''
+        Removes specific patterns like[:) | :(] and emoticons from the given text.
+        :type text: list[str]
+        :return: Text without emoticons.
+        :rtype: str
+        '''
+        # Define a regular expression pattern to match emoticons
+        emoticon_pattern = re.compile(r':(\)+)|:-(\))+|;(\))+|:-(D)+|:(D)+|;-(D)+|x(D)+|X(D)+|:-(\()+|:(\()+|:-(/)+|:(/)+|:-(\))+||:(\))+||:-(O)+|:(O)+|:-(\*)+|:(\*)+|<(3)+|:(P)+|:-(P)+|;(P)+|;-(P)+|:(S)+|>:(O)+|8(\))+|B-(\))+|O:(\))+', flags=re.IGNORECASE)
+        # Remove emoticons using the pattern
+        return emoticon_pattern.sub('', text)
+    
+    def remove_non_alphabetic(self,text:str) -> str:
+        '''
+        Removes non-alphabetic characters from the given text.
+        :type text: str
+        :return: Text without non-alphabetic characters.
+        :rtype: str
+        '''
+        cleaned_text = re.sub(r'\W+', ' ', text)
+        return cleaned_text
+    
+    def clean(self, line: str, steps: list[str] = None, empty: str ='Normal') -> list[str]:
         '''
         Clean the line and return it as a list of tokens
         :param line: the line to clean
@@ -274,7 +337,11 @@ class Preprocessor:
             'tokenize_sentence': self.tokenize_sentence,
             'check_sentence_spelling': self.check_sentence_spelling,
             'remove_stop_words': self.remove_stop_words,
-            'lemm_sentence': self.lemm_sentence
+            'lemm_sentence': self.lemm_sentence,
+            'detokenize_sentence': self.detokenize_sentence,
+            'remove_emojis': self.remove_emojis,
+            'remove_emoticons': self.remove_emoticons,
+            'remove_non_alphabetic': self.remove_non_alphabetic
         }
         
         # Apply the specified steps
@@ -287,10 +354,10 @@ class Preprocessor:
             line = [line]
 
         if len(line) == 0:
-            return ['Normal']
-        
-        return line
+            return [empty]
 
+        return line
+     
 def test() -> None:
     class TestPreprocessor(unittest.TestCase):
 
