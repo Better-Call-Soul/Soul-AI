@@ -5,6 +5,7 @@ from nltk.corpus import stopwords
 from preprocess.preprocess import Preprocessor
 from preprocess.fastcoref import Fastcoref
 from preprocess.capitalize import Capitalize
+from utils.utils import best_len_of_summary
 
 # Class for machine learning based summarization of text using tf-idf algorithm
 class TfIdfSummarization:
@@ -136,13 +137,13 @@ class TfIdfSummarization:
             sent_data.append(temp)
         return sent_data
 
-    # Calculate the best number of sentences for the summary
-    def best_num_sentences(self,sentences: list[str]) -> int:
-        # if the number of sentences is less than or equal to 3 then return the number of sentences
-        if len(sentences) <= 3:
-            return len(sentences)
-        # else return 1.3 times the log of the number of sentences
-        return round(1.3 * math.log(len(sentences)))
+    # # Calculate the best number of sentences for the summary
+    # def best_num_sentences(self,sentences: list[str]) -> int:
+    #     # if the number of sentences is less than or equal to 3 then return the number of sentences
+    #     if len(sentences) <= 3:
+    #         return len(sentences)
+    #     # else return 1.3 times the log of the number of sentences
+    #     return round(1.3 * math.log(len(sentences)))
     
     # Rank the sentences based on the score
     def rank_sentence_by_avg(self, data: list[dict[int,float,str]]) -> str:
@@ -164,7 +165,7 @@ class TfIdfSummarization:
         # sort the sentences based on the score
         data.sort(key=lambda x: x['score'], reverse=True)
         # get the best number of sentences for the summary
-        best_num=self.best_num_sentences(data)
+        best_num=best_len_of_summary(data)
         # get the top sentences
         top_sentences=data[:best_num]
         # sort by id

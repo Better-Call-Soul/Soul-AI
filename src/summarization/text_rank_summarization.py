@@ -12,9 +12,10 @@ from preprocess.preprocess import Preprocessor
 from preprocess.fastcoref import Fastcoref
 from sentence_transformers import  util
 from transformer.roberta_base_go_emotions import Classifier
+from utils.utils import best_len_of_summary
 
 # TextRank
-# This class is used to summarize text using the TextRank algorithm
+# This class is used to summarize text using the TextRank algorithmd
 class TextRank:
     def __init__(self,dampening_factor:int=0.85,error_threshold:int=0.01):
         self.nodes = []
@@ -40,11 +41,11 @@ class TextRank:
                 self.nodes[node_num].connect(inner_vertex, similarity)
                 self.nodes[inner_vertex].connect(node_num, similarity)
     
-    # get the best length of the summary
-    def best_len_of_summary(self)->int:
-        if len(self.nodes) <= 3:
-            return len(self.nodes)
-        return round(1.3 * math.log(len(self.org_sentences)))
+    # # get the best length of the summary
+    # def best_len_of_summary(self)->int:
+    #     if len(self.nodes) <= 3:
+    #         return len(self.nodes)
+    #     return round(1.3 * math.log(len(self.org_sentences)))
     
     # rank the nodes based on the weight
     def rank_nodes(self)->list[Node]:
@@ -58,10 +59,11 @@ class TextRank:
         # use a set to track seen statements and a list to store unique statements
         seen_statements = set()
         unique_statements = []
-        # iterate through each statement
+
         for statement in statements:
             # remove leading/trailing whitespace and convert to lowercase for comparison
             clean_statement = statement.strip().lower()
+
             # if the statement is not already seen, add to unique list and seen set
             if clean_statement not in seen_statements:
                 unique_statements.append(statement.strip())
@@ -131,7 +133,8 @@ class TextRank:
             # if the transform flag is set
             if(self.transform_flag):
                 self.nodes[vertex_num].weight+=0.2*self.classifier.mental_health_score(self.classifier.predict(self.org_sentences[self.nodes[vertex_num].id])[0])
-
+            # print(self.nodes[vertex_num].weight)
+    
     # get the top sentences
     def get_top_sentences(self, num_sentences:int)->str:
         self.rank_nodes()
@@ -151,10 +154,7 @@ class TextRank:
 
     # summarize the text data
     def summary(self, text:str, num_summary_sentences:int=None)->str:
-        # check if the text is a string
-        if not isinstance(text, str):
-            raise TypeError('Ensure that you pass valid values')
-        
+
         # process the text data
         self.process(text)
         # initialize the nodes
@@ -166,6 +166,9 @@ class TextRank:
         error_level = 10
         # iterate until the error level is less than the threshold
         while error_level > self.error_threshold:
+            # print("error_level",error_level)
+            # print("------------------------------------")
+
             self.update_nodes_weights()
             if cur is None:
                 # cur = self.nodes[0].weight
@@ -176,10 +179,11 @@ class TextRank:
                 # cur = self.nodes[0].weight
                 cur=sum([node.weight for node in self.nodes])/len(self.nodes)
                 error_level = abs(cur - last)
+            
                 
         # get the best length of the summary if not provided
         if not num_summary_sentences:
-            num_summary_sentences = self.best_len_of_summary()
+            num_summary_sentences = best_len_of_summary(self.org_sentences)
         
         # get the top sentences
         output = self.get_top_sentences(num_summary_sentences)

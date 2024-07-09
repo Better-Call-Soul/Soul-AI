@@ -1,8 +1,9 @@
 from summarization import TfIdfSummarization
 # from summarization import TextRank
-summ=TfIdfSummarization()
+from summarization import ClusteringSummarization
+summ=ClusteringSummarization()
 text = [
-    "Hello, I am depressed. yes, but no one loves me I should kill my self. How to find the right person. may be I will. I hate everyone I hate every body, no one cares about me. I just think I should die. yes, but I think family or friends wont help me. may be I will try to talk with my family. I will try."
+    "Hello, I am depressed. yes, but no one loves me I should kill my self. yes, but no one loves me I should kill my self. How to find the right person. may be I will. I hate everyone I hate every body, no one cares about me. I just think I should die. yes, but I think family or friends wont help me. may be I will try to talk with my family. I will try."
 ]
 for i in range(len(text)):
     print ("Example:", i+1)
