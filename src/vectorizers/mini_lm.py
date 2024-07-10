@@ -12,5 +12,5 @@ class MiniLM:
     def encode(self, statements):
         # output the embeddings of the statements
         # the feature vectors are normalized to have a length of 384-dimensional dense vector space
-        return self.model.encode(statements, convert_to_tensor=True)
+        return self.model.encode(statements)
     

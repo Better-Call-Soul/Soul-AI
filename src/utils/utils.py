@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import math
 
 def save_model(model, save_path):
     """
@@ -26,3 +27,12 @@ def load_model(load_path):
     with open(load_path, 'rb') as f:
         model = pickle.load(f)
     return model
+
+
+# Calculate the best number of sentences for the summary
+def best_len_of_summary(sentences: list[str]) -> int:
+    # if the number of sentences is less than or equal to 3 then return the number of sentences
+    if len(sentences) <= 3:
+        return len(sentences)
+    # else return 1.3 times the log of the number of sentences
+    return round(1.3 * math.log(len(sentences)))
