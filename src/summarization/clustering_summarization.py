@@ -7,23 +7,35 @@ from vectorizers.tf_idf_vectorizer import TFIDFVectorizer
 from utils.utils import best_len_of_summary
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
+from typing import Literal
+from scipy.cluster.hierarchy import linkage, fcluster
+from sklearn.cluster import DBSCAN
+from sklearn.metrics import pairwise_distances
+import numpy as np
+
 
 class ClusteringSummarization:
-    def __init__(self):
-        self.cluster_count = 3
+    def __init__(self,embeddings_type: Literal['tf-idf', 'mini-lm']='tf-idf',
+                cluster_type: Literal['kmeans', 'hierarchy','dbscan']='kmeans'):
+        self.n_centroids = 0
         self.fastcoref=Fastcoref()
         self.capitalize=Capitalize()
         self.preprocess=Preprocessor()
-        self.vectorize = MiniLM()
         self.org_sentences=[]
         self.clean_sentences=[]
-        # self.length_of_summary=0
-        self.vectorizer=None
-        self.vectorizer = TFIDFVectorizer()
+        self.embeddings_type=embeddings_type
+        self.cluster_type=cluster_type
+        # check the embeddings type
+        if(embeddings_type=='tf-idf'):
+            self.vectorizer = TFIDFVectorizer()
+        elif(embeddings_type=='mini-lm'):
+            self.vectorizer = MiniLM()
+        else:
+            raise ValueError("Invalid embeddings type")
 
     
     def initialize(self):
-        self.cluster_count=best_len_of_summary(self.org_sentences)
+        self.n_centroids=best_len_of_summary(self.org_sentences)
         
     # process the text data and create the nodes
     def process(self, text:str):
@@ -55,53 +67,97 @@ class ClusteringSummarization:
             "remove_extra_space","tokenize_sentence","check_sentence_spelling","detokenize_sentence"]
             ,"")[0]
             self.clean_sentences.append(sentence)
-            
+    
+    # encode the text data
     def encode(self, sentences:list[str])->list[list[float]]:
-        return self.vectorizer.fit_transform(sentences)
+        if (self.embeddings_type=='mini-lm'):
+            return self.vectorizer.encode(sentences)
+        else:
+            return self.vectorizer.fit_transform(sentences)
         
-        
+    # cluster the data
     def cluster(self,encoded_data:list[list[float]]):
-        kmeans = KMeans(n_clusters=self.cluster_count)
-        kmeans.fit(encoded_data)
-        self.clusters = kmeans.labels_.tolist()
+        #############  Kmeans ###############
+        if self.cluster_type=='kmeans':
+            kmeans = KMeans(n_clusters=self.n_centroids)
+            kmeans.fit(encoded_data)
+            self.clusters = kmeans.labels_.tolist()
+        #############  Hierarchy ###############
+        elif self.cluster_type=='hierarchy':
+            # linkage matrix
+            Z = linkage(encoded_data, 'ward')
+            # get the distance between the clusters being merged.
+            distances = Z[:, 2]
+            print("len ",(distances))
+            # calculate mean and standard deviation of the distances
+            mean_distance = np.mean(distances)
+            std_distance = np.std(distances)
+
+            # set max_d dynamically (e.g., mean + 1/2* standard deviation)
+            max_d = mean_distance + std_distance/2
+            # cluster the data
+            self.clusters = fcluster(Z, max_d, criterion='distance')
+        #############  DBSCAN ###############
+        elif self.cluster_type=='dbscan':
+            distances = pairwise_distances(encoded_data)
+            eps = max(np.mean(distances),1)
+            # print("eps",eps)
+            min_samples = max(int(len(encoded_data) * 0.1),1)
+            # print("min_samples",min_samples)
+            dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+            self.clusters = dbscan.fit_predict(encoded_data)
+        else:
+            raise ValueError("Invalid cluster type")
         print(self.clusters)
     
+    # create a dictionary of sentences
     def create_sentence_dictionary(self):
-        self.sentenceDictionary = {}
-        for idx, sentence in enumerate(self.org_sentences):
+        self.sentenceDict = {}
+        # loop for each sentence
+        for key, sentence in enumerate(self.org_sentences):
             # print(idx)
-            self.sentenceDictionary[idx] = {
+            # fill the dictionary with the sentence, cleaned sentence and cluster
+            self.sentenceDict[key] = {
                 'text': sentence,
-                'cluster': self.clusters[idx],
-                'cleaned': self.clean_sentences[idx]
+                'cleaned': self.clean_sentences[key],
+                'cluster': self.clusters[key],
             }
     
+    # create a dictionary of clusters
     def create_cluster_dictionary(self):
-        self.clusterDictionary = {}
-        for key, sentence in  self.sentenceDictionary.items():
-            if sentence['cluster'] not in  self.clusterDictionary:
-                self.clusterDictionary[sentence['cluster']] = []
-            self.clusterDictionary[sentence['cluster']].append(sentence['cleaned'])
-            sentence['idx'] = len(self.clusterDictionary[sentence['cluster']]) - 1
+        self.clustersDic = {}
+        # loop for each sentence in the sentence dictionary
+        for _, sentence in  self.sentenceDict.items():
+            # if the cluster is not in the dictionary, add it
+            if sentence['cluster'] not in  self.clustersDic:
+                # add the cluster to the dictionary
+                self.clustersDic[sentence['cluster']] = []
+            # append the cleaned sentence to the cluster
+            self.clustersDic[sentence['cluster']].append(sentence['cleaned'])
+            sentence['key'] = len(self.clustersDic[sentence['cluster']]) - 1
     
+    # rank the sentences
     def rank_sentences(self):
-        self.maxCosineScores = {}
-        for key, clusterSentences in self.clusterDictionary.items():
-            self.maxCosineScores[key] = {}
-            self.maxCosineScores[key]['score'] = -1
-            tfidf_matrix = self.encode(clusterSentences)
-            # print("tfidf_matrix",tfidf_matrix)
+        self.cosineScore = {}
+        # loop for each cluster in the cluster dictionary
+        for key, clusterSentences in self.clustersDic.items():
+            self.cosineScore[key] = {}
+            # initialize the score to -1 for each cluster
+            self.cosineScore[key]['score'] = -1
+            # encode the cluster sentences 
+            matrix = self.encode(clusterSentences)
+            # calculate the cosine similarity matrix
+            cos_sim_matrix = cosine_similarity(matrix)
+            # loop for each row in the cosine similarity matrix
+            for index, row in enumerate(cos_sim_matrix):
+                # calculate the sum of the row
+                score=sum(row)
+                # if the score is greater than the previous score, update the score and the key
+                if score >  self.cosineScore[key]['score']:
+                    self.cosineScore[key]['score'] = score
+                    self.cosineScore[key]['key'] = index
 
-            cos_sim_matrix = cosine_similarity(tfidf_matrix)
-            # print("cos_sim_matrix",cos_sim_matrix)
-            for idx, row in enumerate(cos_sim_matrix):
-                sum = 0
-                for col in row:
-                    sum += col
-                if sum >  self.maxCosineScores[key]['score']:
-                    self.maxCosineScores[key]['score'] = sum
-                    self.maxCosineScores[key]['idx'] = idx
-
+    # generate the summary of the text
     def summary(self, text:str)->str:
         # process the text data
         self.process(text)
@@ -121,19 +177,23 @@ class ClusteringSummarization:
         self.create_cluster_dictionary()
         # rank the sentences
         self.rank_sentences()
-        resultIndices = []
-        i = 0
-        for key, value in self.maxCosineScores.items():
-            cluster = key
-            idx = value['idx']
-            for key, value in self.sentenceDictionary.items():
-                if value['cluster'] == cluster and value['idx'] == idx:
-                    resultIndices.append(key)
-
-        resultIndices.sort()
+        outputIndices = []
+        # loop for each cluster in the cosine score dictionary
+        for cluster, obj in self.cosineScore.items():
+            # get the index of the sentence
+            index = obj['key']
+            # loop for each sentence in the sentence dictionary
+            for index_statement, sentence_obj in self.sentenceDict.items():
+                if sentence_obj['cluster'] == cluster and sentence_obj['key'] == index:
+                    outputIndices.append(index_statement)
+                
+        # sort the indices of the sentences in the output to be in order
+        outputIndices.sort()
         
+        # create the output summary
         output_summary = ''
-        for idx in resultIndices:
+        for idx in outputIndices:
             output_summary += self.org_sentences[idx] + ' '
-            
+        # capitalize the first letter of the summary
+        output_summary = self.capitalize.capitalize(output_summary)
         return output_summary
