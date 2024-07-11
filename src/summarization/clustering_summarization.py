@@ -15,8 +15,8 @@ import numpy as np
 
 
 class ClusteringSummarization:
-    def __init__(self,embeddings_type: Literal['tf-idf', 'mini-lm']='tf-idf',
-                cluster_type: Literal['kmeans', 'hierarchy','dbscan']='kmeans'):
+    def __init__(self,embeddings_type: Literal['tf-idf', 'mini-lm']='mini-lm',
+                cluster_type: Literal['kmeans', 'hierarchy','dbscan']='hierarchy'):
         self.n_centroids = 0
         self.fastcoref=Fastcoref()
         self.capitalize=Capitalize()

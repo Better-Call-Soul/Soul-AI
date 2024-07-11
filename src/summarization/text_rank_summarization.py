@@ -20,7 +20,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # TextRank
 # This class is used to summarize text using the TextRank algorithmd
 class TextRank:
-    def __init__(self,embeddings_type: Literal['tf-idf', 'mini-lm']='tf-idf',
+    def __init__(self,embeddings_type: Literal['tf-idf', 'mini-lm']='mini-lm',
                 method: Literal['jacard-index', 'cosine-similarity']='cosine-similarity',dampening_factor:int=0.85,error_threshold:int=0.01):
         self.nodes = []
         self.dampening_factor = dampening_factor # damping factor used in the PageRank algorithm
@@ -90,6 +90,14 @@ class TextRank:
     
     # process the text data and create the nodes
     def process(self, text:str):
+        # clear
+        self.num_nodes = 0
+        self.nodes=[]
+        self.unconnected_nodes = set()
+        self.filter_sentences = []  
+        self.org_sentences = []
+        
+        
         text=self.fastcoref.coreference_resolution(text)
         # split the text into sentences and preprocess each sentence
         statements = re.findall(r'[^.!?]+[.!?]', text)

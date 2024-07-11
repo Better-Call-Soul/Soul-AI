@@ -60,7 +60,7 @@ class TfIdfSummarization:
     def count_in_sentences(self, sentences:list[str]) -> list[dict[str,int]]:
         count=[]
         for i,sentence in enumerate(sentences):
-            temp={'id':i,'word_count':self.count_words(sentence[:-1])}
+            temp={'id':i,'word_count':self.count_words(sentence)}
             count.append(temp)
         return count
 
