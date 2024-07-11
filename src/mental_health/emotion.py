@@ -52,12 +52,12 @@ class Emotion:
                 model_path='../../models',
                 isTrain=False,
                 seed=2,
-                model_name='model_100E',
+                model_name='model_200E_f2',
                 batch_size=16,
                 embedding_size=300,
                 lstm_hidden_size=500,
                 hidden_layer_size=512,
-                epochs=100,
+                epochs=200,
                 num_classes=7,
                 learning_rate=0.001,
                 word2vec=Glove(),
@@ -645,8 +645,9 @@ if __name__ == '__main__':
         print('''
             Choose the mode you want to operate...
             1. Train Mode
-            2. Production Mode
-            3. loop model
+            2. Test Mode
+            3. Production Mode
+            4. loop model
             else to exit
             ''')
         mode = input("Enter your choice: ")
@@ -655,8 +656,11 @@ if __name__ == '__main__':
             emotion_model.dev_mode()
         elif mode == '2':
             emotion_model = Emotion()
-            emotion_model.prod_mode()
+            emotion_model.dev_mode()
         elif mode == '3':
+            emotion_model = Emotion()
+            emotion_model.prod_mode()
+        elif mode == '4':
             emotion_model = Emotion()
             emotion_model.loop_mode()
         else:
