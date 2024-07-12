@@ -12,11 +12,16 @@ from preprocess.preprocess import Preprocessor
 from preprocess.fastcoref import Fastcoref
 from sentence_transformers import  util
 from transformer.roberta_base_go_emotions import Classifier
+from utils.utils import best_len_of_summary
+from typing import Literal
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
 # TextRank
-# This class is used to summarize text using the TextRank algorithm
+# This class is used to summarize text using the TextRank algorithmd
 class TextRank:
-    def __init__(self,dampening_factor:int=0.85,error_threshold:int=0.01):
+    def __init__(self,embeddings_type: Literal['tf-idf', 'mini-lm']='mini-lm',
+                method: Literal['jacard-index', 'cosine-similarity']='cosine-similarity',dampening_factor:int=0.85,error_threshold:int=0.01):
         self.nodes = []
         self.dampening_factor = dampening_factor # damping factor used in the PageRank algorithm
         self.num_nodes = 0
@@ -27,24 +32,57 @@ class TextRank:
         self.fastcoref=Fastcoref()
         self.capitalize=Capitalize()
         self.preprocess=Preprocessor()
-        self.vectorize = MiniLM()
+        self.embeddings_type=embeddings_type
+        self.method=method
+        # check the embeddings type
+        if(embeddings_type=='tf-idf'):
+            self.vectorizer = TFIDFVectorizer()
+        elif(embeddings_type=='mini-lm'):
+            self.vectorizer = MiniLM()
+        else:
+            raise ValueError("Invalid embeddings type")
         self.classifier=Classifier()
         self.transform_flag=True
     
+    # calculate the jacard index between two sentences
+    def jaccard_index(self,node1:Node, node2: Node)->float:
+        # get sentence embeddings
+        sentence1 = self.filter_sentences[node1.id]
+        sentence2 = self.filter_sentences[node2.id]
+        
+        # tokenize the sentences into words using NLTK
+        set1 = set(word_tokenize(sentence1))
+        set2 = set(word_tokenize(sentence2))
+        
+        # calculate the intersection and union of the sets
+        intersection = set1.intersection(set2)
+        union = set1.union(set2)
+        
+        # compute the Jaccard index
+        jaccard_sim = len(intersection) / len(union)
+        
+        return jaccard_sim
+
     # initialize the nodes with the cosine similarity between the sentences
     def initialize(self):
         for node_num in range(len(self.nodes) - 1):
             for inner_vertex in range(node_num + 1, len(self.nodes)):
-                # calculate the cosine similarity between the sentences
-                similarity = self.cosine_similarity(self.nodes[node_num], self.nodes[inner_vertex])
+                if(self.method=='jacard-index'):
+                    # calculate the jacard index between the sentences
+                    similarity = self.jaccard_index(self.nodes[node_num], self.nodes[inner_vertex])
+                elif(self.method=='cosine-similarity'):
+                    # calculate the cosine similarity between the sentences
+                    similarity = self.cosine_similarity_nodes(self.nodes[node_num], self.nodes[inner_vertex])
+                else:
+                    raise ValueError("Invalid method")
                 self.nodes[node_num].connect(inner_vertex, similarity)
                 self.nodes[inner_vertex].connect(node_num, similarity)
     
-    # get the best length of the summary
-    def best_len_of_summary(self)->int:
-        if len(self.nodes) <= 3:
-            return len(self.nodes)
-        return round(1.3 * math.log(len(self.org_sentences)))
+    # # get the best length of the summary
+    # def best_len_of_summary(self)->int:
+    #     if len(self.nodes) <= 3:
+    #         return len(self.nodes)
+    #     return round(1.3 * math.log(len(self.org_sentences)))
     
     # rank the nodes based on the weight
     def rank_nodes(self)->list[Node]:
@@ -52,9 +90,30 @@ class TextRank:
     
     # process the text data and create the nodes
     def process(self, text:str):
+        # clear
+        self.num_nodes = 0
+        self.nodes=[]
+        self.unconnected_nodes = set()
+        self.filter_sentences = []  
+        self.org_sentences = []
+        
+        
         text=self.fastcoref.coreference_resolution(text)
         # split the text into sentences and preprocess each sentence
         statements = re.findall(r'[^.!?]+[.!?]', text)
+        # use a set to track seen statements and a list to store unique statements
+        seen_statements = set()
+        unique_statements = []
+
+        for statement in statements:
+            # remove leading/trailing whitespace and convert to lowercase for comparison
+            clean_statement = statement.strip().lower()
+
+            # if the statement is not already seen, add to unique list and seen set
+            if clean_statement not in seen_statements:
+                unique_statements.append(statement.strip())
+                seen_statements.add(clean_statement)
+        statements=unique_statements
         self.org_sentences =  [statement.strip() for statement in statements]
         # preprocessing steps:
         # print("statements",statements)
@@ -77,16 +136,32 @@ class TextRank:
         self.num_nodes += 1
     
     # calculate the cosine similarity between two nodes
-    def cosine_similarity(self, node1:Node, node2: Node)->float:
-        # get sentence embeddings using a pre-trained SentenceTransformer model
-        sentence1 = self.org_sentences[node1.id]
-        sentence2 = self.org_sentences[node2.id]
-        embedding1 = self.vectorize.encode(sentence1)
-        embedding2 = self.vectorize.encode(sentence2)
+    def cosine_similarity_nodes(self, node1:Node, node2: Node)->float:
+        # get sentence embeddings 
+        sentence1 = self.filter_sentences[node1.id]
+        sentence2 = self.filter_sentences[node2.id]
+        if(self.embeddings_type=='mini-lm'):
+            embedding1 = self.vectorizer.encode(sentence1)
+            embedding2 = self.vectorizer.encode(sentence2)
+            # compute cosine similarity
+            similarity = util.pytorch_cos_sim(embedding1, embedding2).item()
+            return similarity
+        elif (self.embeddings_type=='tf-idf'):
+            embedding=self.vectorizer.fit_transform([sentence1,sentence2])
+            embedding1=embedding[0]
+            embedding2=embedding[1]
+            # compute the dot product
+            dot_product = np.dot(embedding1, embedding2)
 
-        # compute cosine similarity
-        similarity = util.pytorch_cos_sim(embedding1, embedding2).item()
-        return similarity
+            # compute the magnitudes (norms) of the vectors
+            norm_1 = np.linalg.norm(embedding1)
+            norm_2 = np.linalg.norm(embedding2)
+            # compute the cosine similarity
+            # compute cosine similarity
+            similarity = dot_product / (norm_1 * norm_2)
+            return similarity
+
+
     
     # get the total edge weights for each node
     def get_edge_totals(self)->list[int]:
@@ -119,7 +194,8 @@ class TextRank:
             # if the transform flag is set
             if(self.transform_flag):
                 self.nodes[vertex_num].weight+=0.2*self.classifier.mental_health_score(self.classifier.predict(self.org_sentences[self.nodes[vertex_num].id])[0])
-
+            # print(self.nodes[vertex_num].weight)
+    
     # get the top sentences
     def get_top_sentences(self, num_sentences:int)->str:
         self.rank_nodes()
@@ -139,10 +215,7 @@ class TextRank:
 
     # summarize the text data
     def summary(self, text:str, num_summary_sentences:int=None)->str:
-        # check if the text is a string
-        if not isinstance(text, str):
-            raise TypeError('Ensure that you pass valid values')
-        
+
         # process the text data
         self.process(text)
         # initialize the nodes
@@ -154,6 +227,7 @@ class TextRank:
         error_level = 10
         # iterate until the error level is less than the threshold
         while error_level > self.error_threshold:
+
             self.update_nodes_weights()
             if cur is None:
                 # cur = self.nodes[0].weight
@@ -164,10 +238,11 @@ class TextRank:
                 # cur = self.nodes[0].weight
                 cur=sum([node.weight for node in self.nodes])/len(self.nodes)
                 error_level = abs(cur - last)
+            
                 
         # get the best length of the summary if not provided
         if not num_summary_sentences:
-            num_summary_sentences = self.best_len_of_summary()
+            num_summary_sentences = best_len_of_summary(self.org_sentences)
         
         # get the top sentences
         output = self.get_top_sentences(num_summary_sentences)

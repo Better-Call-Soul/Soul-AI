@@ -5,6 +5,7 @@ from nltk.corpus import stopwords
 from preprocess.preprocess import Preprocessor
 from preprocess.fastcoref import Fastcoref
 from preprocess.capitalize import Capitalize
+from utils.utils import best_len_of_summary
 
 # Class for machine learning based summarization of text using tf-idf algorithm
 class TfIdfSummarization:
@@ -19,6 +20,19 @@ class TfIdfSummarization:
     def clean_text(self,text:str) -> list[str]:
         text=self.fastcoref.coreference_resolution(text)
         statements = re.findall(r'[^.!?]+[.!?]', text)
+        # use a set to track seen statements and a list to store unique statements
+        seen_statements = set()
+        unique_statements = []
+        # iterate through each statement
+        for statement in statements:
+            # remove leading/trailing whitespace and convert to lowercase for comparison
+            clean_statement = statement.strip().lower()
+            # if the statement is not already seen, add to unique list and seen set
+            if clean_statement not in seen_statements:
+                unique_statements.append(statement.strip())
+                seen_statements.add(clean_statement)
+        statements=unique_statements
+        
         self.originalStatements = statements
         sentences =[]
         # preprocessing steps:
@@ -46,7 +60,7 @@ class TfIdfSummarization:
     def count_in_sentences(self, sentences:list[str]) -> list[dict[str,int]]:
         count=[]
         for i,sentence in enumerate(sentences):
-            temp={'id':i,'word_count':self.count_words(sentence[:-1])}
+            temp={'id':i,'word_count':self.count_words(sentence)}
             count.append(temp)
         return count
 
@@ -123,13 +137,13 @@ class TfIdfSummarization:
             sent_data.append(temp)
         return sent_data
 
-    # Calculate the best number of sentences for the summary
-    def best_num_sentences(self,sentences: list[str]) -> int:
-        # if the number of sentences is less than or equal to 3 then return the number of sentences
-        if len(sentences) <= 3:
-            return len(sentences)
-        # else return 1.3 times the log of the number of sentences
-        return round(1.3 * math.log(len(sentences)))
+    # # Calculate the best number of sentences for the summary
+    # def best_num_sentences(self,sentences: list[str]) -> int:
+    #     # if the number of sentences is less than or equal to 3 then return the number of sentences
+    #     if len(sentences) <= 3:
+    #         return len(sentences)
+    #     # else return 1.3 times the log of the number of sentences
+    #     return round(1.3 * math.log(len(sentences)))
     
     # Rank the sentences based on the score
     def rank_sentence_by_avg(self, data: list[dict[int,float,str]]) -> str:
@@ -151,7 +165,7 @@ class TfIdfSummarization:
         # sort the sentences based on the score
         data.sort(key=lambda x: x['score'], reverse=True)
         # get the best number of sentences for the summary
-        best_num=self.best_num_sentences(data)
+        best_num=best_len_of_summary(data)
         # get the top sentences
         top_sentences=data[:best_num]
         # sort by id
