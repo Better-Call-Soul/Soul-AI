@@ -458,10 +458,10 @@ class Emotion:
         else:
             print("The preprocessed test data already exists")
 
-        
+
+        train_data, train_label = self.helper.load_tuple(self.train_preprocess)
         if self.isTrain:
             # load data (train, dev, test)
-            train_data, train_label = self.helper.load_tuple(self.train_preprocess)
             dev_data, dev_label = self.helper.load_tuple(self.dev_preprocess)
         test_data, test_label = self.helper.load_tuple(self.test_preprocess)
 
