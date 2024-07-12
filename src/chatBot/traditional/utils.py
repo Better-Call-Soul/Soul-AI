@@ -1,6 +1,12 @@
 import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
 from scipy.spatial import distance
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))))
+
+from vectorizers.count_vectorizer import CountVectorizer
 
 def map_tag_pattern(df, tag_col, text_col, res_col):
   '''
@@ -45,10 +51,8 @@ def cosine_distance_countvectorizer_method(s1, s2):
     # text to vector
     vectorizer = CountVectorizer()
     all_sentences_to_vector = vectorizer.fit_transform(allsentences)
-    text_to_vector_v1 = all_sentences_to_vector.toarray()[0].tolist()
-    text_to_vector_v2 = all_sentences_to_vector.toarray()[1].tolist()
-    # print(text_to_vector_v1)
-    # print(text_to_vector_v2)
+    text_to_vector_v1 = all_sentences_to_vector[0]
+    text_to_vector_v2 = all_sentences_to_vector[1]
 
     # distance of similarity
     cosine = distance.cosine(text_to_vector_v1, text_to_vector_v2)
@@ -65,15 +69,15 @@ if __name__ ==  "__main__":
 
     vectorizer = CountVectorizer()
     sen = vectorizer.fit_transform(["hany am mama dada hany", "ahmed is an hany question, can you hany that you am?"])
-    text_to_vector_v1 = sen.toarray()[0].tolist()
-    text_to_vector_v2 = sen.toarray()[1].tolist()
+    text_to_vector_v1 = sen[0]
+    text_to_vector_v2 = sen[1]
 
     sen1 = vectorizer.transform(['hany am ahmed hany', "hany am mama dada hany"])
     sen2 = vectorizer.transform(['hany am ahmed hany', "ahmed is an hany question, can you hany that you am?"])
-    text_to_vector_v3 = sen1.toarray()[0].tolist()
-    text_to_vector_v4 = sen1.toarray()[1].tolist()
-    text_to_vector_v5 = sen2.toarray()[0].tolist()
-    text_to_vector_v6 = sen2.toarray()[1].tolist()
+    text_to_vector_v3 = sen1[0]
+    text_to_vector_v4 = sen1[1]
+    text_to_vector_v5 = sen2[0]
+    text_to_vector_v6 = sen2[1]
     print(text_to_vector_v3, text_to_vector_v4)
     print(text_to_vector_v5, text_to_vector_v6)
 

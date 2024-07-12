@@ -1,29 +1,6 @@
 <mxfile host="65bd71144e">
-    <diagram id="hMVIPNOCL1WMG9UD9Ap6" name="Page-2">
-        <mxGraphModel dx="2209" dy="807" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
-            <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
-                <mxCell id="U02Nljkob9dexw82LkDx-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="553.5" y="220" width="212" height="210" as="geometry"/>
-                </mxCell>
-                <mxCell id="U02Nljkob9dexw82LkDx-2" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Suicidal Detection&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-                    <mxGeometry x="532" y="231.5" width="252.5" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="U02Nljkob9dexw82LkDx-3" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="U02Nljkob9dexw82LkDx-4" target="U02Nljkob9dexw82LkDx-5">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="U02Nljkob9dexw82LkDx-4" value="Count Vectorizer =&amp;gt; Logistic Regression" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
-                    <mxGeometry x="608.25" y="280" width="96" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="U02Nljkob9dexw82LkDx-5" value="Glove =&amp;gt; LSTM&lt;br&gt;=&amp;gt; Attention =&amp;gt; MaxPooling" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
-                    <mxGeometry x="608.25" y="353.5" width="96" height="50" as="geometry"/>
-                </mxCell>
-            </root>
-        </mxGraphModel>
-    </diagram>
     <diagram id="nxzzNV7BYu5baKhF10Te" name="Page-1">
-        <mxGraphModel dx="2838" dy="726" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="3183" dy="943" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -94,7 +71,7 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="22" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="554" y="940" width="212" height="280" as="geometry"/>
+                    <mxGeometry x="527" y="940" width="266" height="210" as="geometry"/>
                 </mxCell>
                 <mxCell id="23" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Detection and Scoring&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="532.5" y="951.5" width="252.5" height="30" as="geometry"/>
@@ -152,7 +129,7 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="44" value="Scheduler" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#66B2FF;" parent="1" vertex="1">
-                    <mxGeometry x="379" y="294.5" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="301" y="294.5" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="45" value="Therapist" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
                     <mxGeometry x="-10" y="650.13" width="30" height="60" as="geometry"/>
@@ -182,13 +159,15 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="67" style="html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;" parent="1" source="59" target="44" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="451.5" y="325" as="sourcePoint"/>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="59" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="553.5" y="220" width="212" height="210" as="geometry"/>
+                    <mxGeometry x="527" y="220" width="265.5" height="210" as="geometry"/>
                 </mxCell>
                 <mxCell id="60" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Suicidal Detection&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-                    <mxGeometry x="532" y="231.5" width="252.5" height="30" as="geometry"/>
+                    <mxGeometry x="533" y="231.5" width="252.5" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="68" value="BART &lt;br&gt;fine-tuning" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF66B3;" parent="1" vertex="1">
                     <mxGeometry x="260" y="705.25" width="80" height="50" as="geometry"/>
@@ -203,16 +182,16 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="78" value="Count Vectorizer =&amp;gt; Logistic Regression" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" parent="1" vertex="1">
-                    <mxGeometry x="608.25" y="280" width="96" height="50" as="geometry"/>
+                    <mxGeometry x="669.25" y="280" width="96" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="80" value="Glove =&amp;gt; LSTM&lt;br&gt;=&amp;gt; GRU" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9933;" parent="1" vertex="1">
-                    <mxGeometry x="610" y="1070" width="96" height="50" as="geometry"/>
+                    <mxGeometry x="672" y="1070" width="96" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="Sqr-_6luysI8qt4BqUSp-90" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="81" target="80" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="81" value="Logistic Regression" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" parent="1" vertex="1">
-                    <mxGeometry x="610.25" y="1000" width="96" height="50" as="geometry"/>
+                    <mxGeometry x="672.25" y="1000" width="96" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="83" value="Text to Speech" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF6666;" parent="1" vertex="1">
                     <mxGeometry x="860" y="614" width="120" height="30" as="geometry"/>
@@ -230,13 +209,45 @@
                     <mxGeometry x="370" y="705.25" width="80" height="48.5" as="geometry"/>
                 </mxCell>
                 <mxCell id="Yz0v-OLk0Z-_11yOdA3S-88" value="Glove =&amp;gt; LSTM&lt;br&gt;=&amp;gt; Attention =&amp;gt; MaxPooling" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" parent="1" vertex="1">
-                    <mxGeometry x="608.25" y="353.5" width="96" height="50" as="geometry"/>
+                    <mxGeometry x="669.25" y="353.5" width="96" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="Yz0v-OLk0Z-_11yOdA3S-94" value="LSTM" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9933;" parent="1" vertex="1">
-                    <mxGeometry x="610.75" y="1140" width="96" height="50" as="geometry"/>
+                    <mxGeometry x="554" y="1070" width="96" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="88" value="LLAMA2 fine-tuning" style="whiteSpace=wrap;html=1;rounded=0;fillColor=#FF66B3;" parent="1" vertex="1">
                     <mxGeometry x="532.5" y="720" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="YwR46mHscbqIDgOWe4QU-89" value="Count Vectorizer =&amp;gt; Similarity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
+                    <mxGeometry x="551" y="280" width="96" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="YwR46mHscbqIDgOWe4QU-90" value="Count Vectorizer =&amp;gt; Similarity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
+                    <mxGeometry x="554" y="1000" width="96" height="50" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="hMVIPNOCL1WMG9UD9Ap6" name="Page-2">
+        <mxGraphModel dx="1696" dy="685" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="340" y="390" width="265.5" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-2" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Suicidal Detection&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="346" y="401.5" width="252.5" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-3" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="Cz3-hvhh2Hp6DVzN9kpJ-4" target="Cz3-hvhh2Hp6DVzN9kpJ-5">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-4" value="Count Vectorizer =&amp;gt; Logistic Regression" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
+                    <mxGeometry x="482.25" y="450" width="96" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-5" value="Glove =&amp;gt; LSTM&lt;br&gt;=&amp;gt; Attention =&amp;gt; MaxPooling" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
+                    <mxGeometry x="482.25" y="523.5" width="96" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-6" value="Count Vectorizer =&amp;gt; Similarity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
+                    <mxGeometry x="364" y="450" width="96" height="50" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

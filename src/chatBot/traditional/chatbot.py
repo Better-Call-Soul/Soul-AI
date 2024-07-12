@@ -31,6 +31,7 @@ class Chatbot:
         '''
         maximum = float('-inf')
         responses = []
+        response = ''
         for i in self.dataset.iterrows():
             sim = cosine_distance_countvectorizer_method(text, i[1][text_col])
             if sim > maximum:
