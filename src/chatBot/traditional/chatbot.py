@@ -40,6 +40,9 @@ class Chatbot:
                 closest = i[1][text_col]
         return response
 
+
+
+
 if __name__ == "__main__":
     
     chatbot = Chatbot()

@@ -47,7 +47,37 @@ def cosine_distance_countvectorizer_method(s1, s2):
     all_sentences_to_vector = vectorizer.fit_transform(allsentences)
     text_to_vector_v1 = all_sentences_to_vector.toarray()[0].tolist()
     text_to_vector_v2 = all_sentences_to_vector.toarray()[1].tolist()
+    # print(text_to_vector_v1)
+    # print(text_to_vector_v2)
 
     # distance of similarity
     cosine = distance.cosine(text_to_vector_v1, text_to_vector_v2)
     return round((1-cosine),2)
+
+
+if __name__ ==  "__main__":
+    '''
+    this is a testing unit of fitting the dataset or fitting on the fly
+    '''
+    cos1 = cosine_distance_countvectorizer_method('hany am ahmed hany', "hany am mama dada hany")
+    cos2 = cosine_distance_countvectorizer_method('hany am ahmed hany', "ahmed is an hany question, can you hany that you am?")
+    print(cos1, cos2)
+
+    vectorizer = CountVectorizer()
+    sen = vectorizer.fit_transform(["hany am mama dada hany", "ahmed is an hany question, can you hany that you am?"])
+    text_to_vector_v1 = sen.toarray()[0].tolist()
+    text_to_vector_v2 = sen.toarray()[1].tolist()
+
+    sen1 = vectorizer.transform(['hany am ahmed hany', "hany am mama dada hany"])
+    sen2 = vectorizer.transform(['hany am ahmed hany', "ahmed is an hany question, can you hany that you am?"])
+    text_to_vector_v3 = sen1.toarray()[0].tolist()
+    text_to_vector_v4 = sen1.toarray()[1].tolist()
+    text_to_vector_v5 = sen2.toarray()[0].tolist()
+    text_to_vector_v6 = sen2.toarray()[1].tolist()
+    print(text_to_vector_v3, text_to_vector_v4)
+    print(text_to_vector_v5, text_to_vector_v6)
+
+    cosine1 = distance.cosine(text_to_vector_v3, text_to_vector_v4)
+    cosine2 = distance.cosine(text_to_vector_v5, text_to_vector_v6)
+    print(round((1-cosine1),2), round((1-cosine2),2))
+
