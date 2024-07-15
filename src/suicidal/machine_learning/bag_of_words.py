@@ -12,7 +12,7 @@ class BagOfWordsScratch:
                              If None, all unique tokens will be considered.
         :type max_features: int, optional
         '''
-        self.vocabulary = {}
+        self.vocabulary_list = {}
         self.max_features = max_features
     
     def fit(self, documents: List[str]):
@@ -22,16 +22,16 @@ class BagOfWordsScratch:
         :param documents: A list of text documents to build the vocabulary from.
         :type documents: List[str]
         '''
-        vocab_counter = Counter()
+        vocab_count = Counter()
         for doc in documents:
-            words = self.tokenize(doc)
-            vocab_counter.update(words)
+            words_tokenized = self.tokenize(doc)
+            vocab_count.update(words_tokenized)
         
         if self.max_features:
-            most_common = vocab_counter.most_common(self.max_features)
-            self.vocabulary = {word: idx for idx, (word, _) in enumerate(most_common)}
+            most_common = vocab_count.most_common(self.max_features)
+            self.vocabulary_list = {word: idx for idx, (word, _) in enumerate(most_common)}
         else:
-            self.vocabulary = {word: idx for idx, word in enumerate(vocab_counter.keys())}
+            self.vocabulary_list = {word: idx for idx, word in enumerate(vocab_count.keys())}
     
     def transform(self, documents: List[str]) -> csr_matrix:
         '''
