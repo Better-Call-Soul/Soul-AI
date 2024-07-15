@@ -101,7 +101,7 @@ if __name__ == "__main__":
     elif model_type == "rf":
         model = RandomForestModel()
     else:
-        model = LogisticRegressionBowModel(BagOfWords(max_features=1000))
+        model = LogisticRegressionBowModel(BagOfWordsScratch(max_features=1000))
     if isTrain:
         model.train_and_tune(flattened_X_train,labels_train,flattened_X_test,labels_test)
         model.save_model(f'models/{model_type}_best_suicidal_detection_model.joblib')
