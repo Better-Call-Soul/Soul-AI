@@ -64,7 +64,8 @@ class ClusteringSummarization:
             ["lower_sentence","remove_emojis","remove_emoticons","remove_nonascii_diacritic",
             "remove_emails","clean_html",
             "remove_url","replace_repeated_chars","expand_sentence","remove_non_alphabetic",
-            "remove_extra_space","tokenize_sentence","check_sentence_spelling","detokenize_sentence"]
+            "remove_extra_space","tokenize_sentence","remove_stop_words","lemm_sentence",
+            "check_sentence_spelling","detokenize_sentence"]
             ,"")[0]
             self.clean_sentences.append(sentence)
     
@@ -88,7 +89,7 @@ class ClusteringSummarization:
             Z = linkage(encoded_data, 'ward')
             # get the distance between the clusters being merged.
             distances = Z[:, 2]
-            print("len ",(distances))
+            # print("len ",(distances))
             # calculate mean and standard deviation of the distances
             mean_distance = np.mean(distances)
             std_distance = np.std(distances)
@@ -108,7 +109,7 @@ class ClusteringSummarization:
             self.clusters = dbscan.fit_predict(encoded_data)
         else:
             raise ValueError("Invalid cluster type")
-        print(self.clusters)
+        # print(self.clusters)
     
     # create a dictionary of sentences
     def create_sentence_dictionary(self):

@@ -78,7 +78,7 @@ class Chatbot:
 
     print(f'Accuracy: {accuracy_sv}, F1: {F1_sv}, Recall: {recall_sv}, Precision: {precision_sv}')
     
-    report_classification(y_test, y_pred, filename=classification_report)
+    # report_classification(y_test, y_pred, filename=classification_report)
 
 
 if __name__ == '__main__':

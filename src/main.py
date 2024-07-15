@@ -3,18 +3,18 @@ from summarization import TextRank
 from summarization import ClusteringSummarization
 from summarization import SummarizationEvaluator
 # summ=ClusteringSummarization('mini-lm' , 'dbscan')
-# summ=TextRank('mini-lm')
-# text = [
-#     "Hello, I am depressed. yes, but no one loves me I should kill my self. yes, but no one loves me I should kill my self. How to find the right person. may be I will. I hate everyone I hate every body, no one cares about me. I just think I should die. yes, but I think family or friends wont help me. may be I will try to talk with my family. I will try."
-# ]
-# for i in range(len(text)):
-#     print ("Example:", i+1)
-#     print(summ.summary(text[i]))
-#     print ("-----------------------------------------------")
+summ=ClusteringSummarization()
+text = [
+    "Hello, I am depressed. yes, but no one loves me I should kill my self. yes, but no one loves me I should kill my self. How to find the right person. may be I will. I hate everyone I hate every body, no one cares about me. I just think I should die. yes, but I think family or friends wont help me. may be I will try to talk with my family. I will try it."
+]
+for i in range(len(text)):
+    print ("Example:", i+1)
+    print(summ.summary(text[i]))
+    print ("-----------------------------------------------")
 
-summ=TextRank()
-evaluation=SummarizationEvaluator(summ)
-print(evaluation.evaluate())
+# summ=TextRank()
+# evaluation=SummarizationEvaluator(summ)
+# print(evaluation.evaluate())
 
 
 

@@ -5,6 +5,7 @@ import numpy as np
 import nltk
 from datasets import load_metric,load_dataset
 import torch
+from preprocess.preprocess import Preprocessor
 
 ## Class for fine-tuning the model
 class FineTuningSummarization:
@@ -14,11 +15,22 @@ class FineTuningSummarization:
         if self.dataset is None:
             raise ValueError("Dataset not found")
         self.metric = load_metric("rouge")
+        self.preprocess=Preprocessor()
+        
+    # Clean the text
+    def clean_text(self,text):
+        clean_text=self.preprocess.clean(text,
+            ["remove_nonascii_diacritic",
+            "remove_emails","clean_html",
+            "remove_url","replace_repeated_chars","expand_sentence"]
+            ,"")[0]
+        return clean_text
     
     # Process the data for training
     def process(self,data):
         inputs = [str(doc) for doc in data["dialogue"]]
-        model_inputs = self.tokenizer(inputs, max_length=self.max_input_length, truncation=True)
+        clean_inputs=[self.clean_text(doc) for doc in inputs]
+        model_inputs = self.tokenizer(clean_inputs, max_length=self.max_input_length, truncation=True)
         # if isinstance(data["summary"], pd.Series):
         #     summaries = data["summary"].tolist()  # convert Series to list
         # else:
@@ -26,7 +38,9 @@ class FineTuningSummarization:
 
         # Setup the tokenizer for summary process
         with self.tokenizer.as_target_tokenizer():
-            labels = self.tokenizer(data["summary"], max_length=self.max_target_length, truncation=True)
+            clean_summary=[self.clean_text(doc) for doc in data["summary"]]
+            labels = self.tokenizer(data[clean_summary], max_length=self.max_target_length, truncation=True)
+            
 
         model_inputs["labels"] = labels["input_ids"]
         return model_inputs
@@ -96,9 +110,16 @@ class FineTuningSummarization:
     
     ## test the model
     def test(self,text,model,tokenizer):
+        text=self.clean_text(text)
         input_ids = tokenizer(text, return_tensors="pt")["input_ids"]
         with torch.no_grad():
             output = model.generate(input_ids)
         summary = tokenizer.batch_decode(output, skip_special_tokens=True)[0]
         return summary
     
+
+if(__name__ == "__main__"):
+    summ=FineTuningSummarization()
+    model,tokenizer=summ.train()
+    print(summ.test("The cat isn't in the box. The cat likes the box. The box is in the house. The house is in the city. The city is in the country. The country is in the world.",model,tokenizer))
+     
