@@ -122,7 +122,8 @@ class TextRank:
             ["lower_sentence","remove_emojis","remove_emoticons","remove_nonascii_diacritic",
             "remove_emails","clean_html",
             "remove_url","replace_repeated_chars","expand_sentence","remove_non_alphabetic",
-            "remove_extra_space","tokenize_sentence","check_sentence_spelling","detokenize_sentence"]
+            "remove_extra_space","tokenize_sentence","remove_stop_words","lemm_sentence",
+            "check_sentence_spelling","detokenize_sentence"]
             ,"")[0]
             # tokenize the sentence
             word_list = word_tokenize(sentence)
