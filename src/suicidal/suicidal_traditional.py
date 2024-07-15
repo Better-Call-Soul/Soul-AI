@@ -52,13 +52,12 @@ class Suicidal:
         self.isTrain = isTrain
         self.split_seed = split_seed
         self.seed = seed
-        self.limit = 100
+        self.limit = 10019
 
         self.model_name = model_name
         self.data_path = f"{self.dataset_path}/Suicide_Detection_Reddit.csv"
-        self.train_preprocess = f"{self.dataset_path}/train/dialogues_train_preprocess.pkl"
-        self.dev_preprocess = f"{self.dataset_path}/validation/dialogues_validation_preprocess.pkl"
-        self.test_preprocess = f"{self.dataset_path}/test/dialogues_test_preprocess.pkl"
+        self.train_preprocess = f"{self.dataset_path}/train/dialogues_train_preprocess_ml.pkl"
+        self.test_preprocess = f"{self.dataset_path}/test/dialogues_test_preprocess_ml.pkl"
         self.model_save_path = f"{self.model_path}/{self.model_name}.pkl"
 
         self.forward_label_mapping = {'suicide': 1, 'non-suicide': 0}
