@@ -30,16 +30,15 @@ class Chatbot:
         :rtype: str
         '''
         maximum = float('-inf')
-        responses = []
-        response = ''
+        all_responses = []
+        res = ''
         for i in self.dataset.iterrows():
-            sim = cosine_distance_countvectorizer_method(text, i[1][text_col])
-            if sim > maximum:
-                maximum = sim
-                responses = i[1][res_col]
-                response = random.choice(responses)
-                closest = i[1][text_col]
-        return response
+            is_max = cosine_distance_countvectorizer_method(text, i[1][text_col])
+            if is_max > maximum:
+                maximum = is_max
+                all_responses = i[1][res_col]
+                res = random.choice(all_responses)
+        return res
 
 
 

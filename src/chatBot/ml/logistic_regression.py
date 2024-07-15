@@ -1,98 +1,111 @@
-from sklearn.linear_model import LogisticRegression
+# from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import recall_score,precision_score,f1_score,accuracy_score
 import joblib
+import numpy as np
 
 from utils import *
 from constants import *
 
-
 class LogisticRegression:
     
-    def __init__(self, lr=0.1, n_iters=10000):
-        self.lr = lr
-        self.n_iters = n_iters
+    def __init__(self, learning_rate=0.1, iterations=10000):
+        self.learning_rate = learning_rate
+        self.iterations = iterations
         self.weights = None
         self.bias = None
     
-    def fit(self,X,y):
-        #init parameters
-        
-        n_samples, n_features = X.shape
-        self.weights = np.zeros(n_features)
+    def fit(self, X, y):
+        # Initialize parameters
+        sample_count, feature_count = X.shape
+        self.weights = np.zeros(feature_count)
         self.bias = 0
 
-        #gradient descent
-        for _ in range(self.n_iters):
-            linear_model = X @ self.weights + self.bias
-            hx = self._sigmoid(linear_model)
+        # Gradient descent
+        for _ in range(self.iterations):
+            linear_output = np.dot(X, self.weights) + self.bias
+            predictions = self._sigmoid(linear_output)
             
-            dw = (X.T * (hx - y)).T.mean(axis=0)
-            db = (hx - y).mean(axis=0)
+            weight_gradient = np.dot(X.T, (predictions - y)) 
+            bias_gradient = np.mean(predictions - y)
 
-            self.weights -= self.lr * dw
-            self.bias -= self.lr * db 
+            self.weights -= self.learning_rate * weight_gradient
+            self.bias -= self.learning_rate * bias_gradient
 
-    def predict(self,X):
-        linear_model = np.dot(X,self.weights) + self.bias
-        y_predicted = self._sigmoid(linear_model)
-        return y_predicted
-  
-    def _sigmoid(self,x):
-        return(1/(1+np.exp(-x)))
-
-class MulticlassClassification:
-    
-    def __init__(self):
-        self.models = []
-
-    def fit(self, X, y):
-        """
-        Fits each model
-        """
-        X=X.toarray()
-        for y_i in np.unique(y):
-            # y_i - positive class for now
-            # All other classes except y_i are negative
-
-            # Choose x where y is positive class
-            x_true = X[y == y_i]
-            # Choose x where y is negative class
-            x_false = X[y != y_i]
-            # Concatanate
-            x_true_false = np.vstack((x_true, x_false))
-
-            # Set y to 1 where it is positive class
-            y_true = np.ones(x_true.shape[0])
-            # Set y to 0 where it is negative class
-            y_false = np.zeros(x_false.shape[0])
-            # Concatanate
-            y_true_false = np.hstack((y_true, y_false))
-
-            # Fit model and append to models list
-            model = LogisticRegression()
-            model.fit(x_true_false, y_true_false)
-            self.models.append([y_i, model])
-
+    def predict_probabilities(self, X):
+        linear_output = np.dot(X, self.weights) + self.bias
+        probabilities = self._sigmoid(linear_output)
+        return probabilities
 
     def predict(self, X):
-        X=X.toarray()
-        y_pred = [[label, model.predict(X)] for label, model in self.models]
+        probabilities = self.predict_probabilities(X)
+        return np.round(probabilities)
 
-        output = []
+    def _sigmoid(self, z):
+        return 1 / (1 + np.exp(-z))
 
-        for i in range(X.shape[0]):
-            max_label = None
-            max_prob = -10**5
-            for j in range(len(y_pred)):
-                prob = y_pred[j][1][i]
-                if prob > max_prob:
-                    max_label = y_pred[j][0]
-                    max_prob = prob
-            output.append(max_label)
+class MultiClassLogisticRegression:
+    
+    def __init__(self):
+        self.classifiers = []
 
-        return output
-      
+    def train(self, X, y):
+        """
+        Train a separate model for each class using one-vs-rest approach.
+        """
+        X_dense = X.toarray() if hasattr(X, 'toarray') else X  # Ensure dense array format
+        unique_classes = np.unique(y)
+
+        for current_class in unique_classes:
+            # Create binary labels for the current class
+            positive_class_mask = y == current_class
+            negative_class_mask = y != current_class
+
+            # Extract samples for current binary classification
+            X_positive = X_dense[positive_class_mask]
+            X_negative = X_dense[negative_class_mask]
+
+            # Concatenate positive and negative samples
+            X_combined = np.vstack((X_positive, X_negative))
+
+            # Create binary labels
+            y_combined = np.hstack((np.ones(X_positive.shape[0]), np.zeros(X_negative.shape[0])))
+
+            # Train the logistic regression model
+            classifier = LogisticRegression()
+            classifier.fit(X_combined, y_combined)
+            
+            # Store the classifier with its corresponding class label
+            self.classifiers.append((current_class, classifier))
+
+    def predict(self, X):
+        """
+        Predict class labels for the given samples.
+        """
+        X_dense = X.toarray() if hasattr(X, 'toarray') else X  # Ensure dense array format
+        class_probabilities = []
+
+        # Get probability predictions from each classifier
+        for class_label, classifier in self.classifiers:
+            probabilities = classifier.predict_probabilities(X_dense)
+            class_probabilities.append((class_label, probabilities))
+
+        predictions = []
+
+        for i in range(X_dense.shape[0]):
+            highest_prob = -np.inf
+            best_class = None
+            
+            # Determine the class with the highest probability for each sample
+            for class_label, probabilities in class_probabilities:
+                if probabilities[i] > highest_prob:
+                    highest_prob = probabilities[i]
+                    best_class = class_label
+            
+            predictions.append(best_class)
+
+        return np.array(predictions)
+    
 class LogisticRegressionModel:
 
   def __init__(self, save_model = False, get_best_params = False):
@@ -147,10 +160,10 @@ class LogisticRegressionModel:
     else:
         print('Default parameters are set')
         # self.model = LogisticRegression(random_state=0)
-        self.model=MulticlassClassification()
+        self.model=MultiClassLogisticRegression()
 
 
-    self.model.fit(X_train, y_train)
+    self.model.train(X_train, y_train)
 
     # plot_learning_curve(self.model, "Learning Curve (Logistice Regression)", X_train, y_train, cv=5, filename=lr_learning_curve)
 

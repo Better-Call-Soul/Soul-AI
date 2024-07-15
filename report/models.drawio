@@ -1,6 +1,23 @@
 <mxfile host="65bd71144e">
+    <diagram id="hMVIPNOCL1WMG9UD9Ap6" name="Page-2">
+        <mxGraphModel dx="933" dy="435" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="dCxWD1sj_W_C16xdZ4-E-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="300" width="180" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="dCxWD1sj_W_C16xdZ4-E-2" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Suicidal Detection&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="286" y="311.5" width="252.5" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="dCxWD1sj_W_C16xdZ4-E-4" value="Count Vectorizer =&amp;gt; Logistic Regression" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
+                    <mxGeometry x="364.25" y="370" width="96" height="50" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
     <diagram id="nxzzNV7BYu5baKhF10Te" name="Page-1">
-        <mxGraphModel dx="3183" dy="943" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2016" dy="544" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -217,37 +234,11 @@
                 <mxCell id="88" value="LLAMA2 fine-tuning" style="whiteSpace=wrap;html=1;rounded=0;fillColor=#FF66B3;" parent="1" vertex="1">
                     <mxGeometry x="532.5" y="720" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="YwR46mHscbqIDgOWe4QU-89" value="Count Vectorizer =&amp;gt; Similarity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
+                <mxCell id="YwR46mHscbqIDgOWe4QU-89" value="Count Vectorizer =&amp;gt; Similarity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" parent="1" vertex="1">
                     <mxGeometry x="551" y="280" width="96" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="YwR46mHscbqIDgOWe4QU-90" value="Count Vectorizer =&amp;gt; Similarity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
+                <mxCell id="YwR46mHscbqIDgOWe4QU-90" value="Count Vectorizer =&amp;gt; Similarity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" parent="1" vertex="1">
                     <mxGeometry x="554" y="1000" width="96" height="50" as="geometry"/>
-                </mxCell>
-            </root>
-        </mxGraphModel>
-    </diagram>
-    <diagram id="hMVIPNOCL1WMG9UD9Ap6" name="Page-2">
-        <mxGraphModel dx="1696" dy="685" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
-            <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
-                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="340" y="390" width="265.5" height="210" as="geometry"/>
-                </mxCell>
-                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-2" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Suicidal Detection&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-                    <mxGeometry x="346" y="401.5" width="252.5" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-3" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="Cz3-hvhh2Hp6DVzN9kpJ-4" target="Cz3-hvhh2Hp6DVzN9kpJ-5">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-4" value="Count Vectorizer =&amp;gt; Logistic Regression" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
-                    <mxGeometry x="482.25" y="450" width="96" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-5" value="Glove =&amp;gt; LSTM&lt;br&gt;=&amp;gt; Attention =&amp;gt; MaxPooling" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
-                    <mxGeometry x="482.25" y="523.5" width="96" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="Cz3-hvhh2Hp6DVzN9kpJ-6" value="Count Vectorizer =&amp;gt; Similarity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#00CC66;" vertex="1" parent="1">
-                    <mxGeometry x="364" y="450" width="96" height="50" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

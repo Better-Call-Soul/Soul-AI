@@ -4,6 +4,8 @@ import json
 import random
 import pandas as pd
 import numpy as np
+import pickle
+import joblib
 
 from utils import *
 from constants import *
@@ -61,6 +63,14 @@ class Chatbot:
     self.train_sequences = self.tokenizer.texts_to_sequences(self.train_data)
     self.train_sequences = keras.preprocessing.sequence.pad_sequences(self.train_sequences)
     
+    with open('tokenizer.pickle', 'wb') as handle:
+      pickle.dump(self.tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    with open('train_sequences.pickle', 'wb') as handle:
+      pickle.dump(self.train_sequences, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    joblib.dump(label_encoder, 'label_encoder.pkl')
+
     # Defining the Sequential model
     model = keras.models.Sequential()
 
@@ -90,29 +100,12 @@ class Chatbot:
     
     if self.save_model:
       self.model.save(model_path)
-      
-
-  # Function to generate response based on the input text
-  def generate_response(self, text):
-      # Tokenizing and padding the input text
-      sequence = self.tokenizer.texts_to_sequences([text])
-      sequence = keras.preprocessing.sequence.pad_sequences(sequence, maxlen=self.train_sequences.shape[1])
-      
-      # Making a prediction
-      prediction = self.model.predict(sequence)
-      
-      # Getting the label with the highest predicted probability
-      predicted_label = np.argmax(prediction)
-      
-      # Decoding the predicted label
-      response = self.label_encoder.inverse_transform([predicted_label])[0]
-      
-      return response
+    
   
 
 if __name__ == '__main__':
   chatbot = Chatbot(save_model=True)
   chatbot.train(epochs=100, batch_size=8)
-  print(chatbot.generate_response('Hi'))
+  # print(chatbot.generate_response('Hi'))
   
 

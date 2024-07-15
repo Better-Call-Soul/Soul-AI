@@ -51,11 +51,10 @@ def cosine_distance_countvectorizer_method(s1, s2):
     # text to vector
     vectorizer = CountVectorizer()
     all_sentences_to_vector = vectorizer.fit_transform(allsentences)
-    text_to_vector_v1 = all_sentences_to_vector[0]
-    text_to_vector_v2 = all_sentences_to_vector[1]
+    v1, v2 = all_sentences_to_vector
 
     # distance of similarity
-    cosine = distance.cosine(text_to_vector_v1, text_to_vector_v2)
+    cosine = distance.cosine(v1, v2)
     return round((1-cosine),2)
 
 
