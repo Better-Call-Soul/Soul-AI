@@ -47,7 +47,7 @@ class Emotion:
                  model_path='../../models',
                  isTrain=False,
                  seed=2,
-                 model_name='model_centroids',
+                 model_name='model_centroids_f2',
                  num_classes = 7
                  ):
 
@@ -55,18 +55,16 @@ class Emotion:
         self.model_path = model_path
         self.isTrain = isTrain
         self.seed = seed
-        self.limit = 100
+        self.limit = -1
 
         self.model_name = model_name
         self.train_data_path = f"{self.dataset_path}/train/dialogues_train.txt"
         self.train_label_path = f"{self.dataset_path}/train/dialogues_emotion_train.txt"
-        self.dev_data_path = f"{self.dataset_path}/validation/dialogues_validation.txt"
-        self.dev_label_path = f"{self.dataset_path}/validation/dialogues_emotion_validation.txt"
         self.test_data_path = f"{self.dataset_path}/test/dialogues_test.txt"
         self.test_label_path = f"{self.dataset_path}/test/dialogues_emotion_test.txt"
-        self.train_preprocess = f"{self.dataset_path}/train/dialogues_train_preprocess_ml.pkl"
-        self.dev_preprocess = f"{self.dataset_path}/validation/dialogues_validation_preprocess_ml.pkl"
-        self.test_preprocess = f"{self.dataset_path}/test/dialogues_test_preprocess_ml.pkl"
+        self.train_preprocess = f"{self.dataset_path}/train/dialogues_train_preprocess_ml_big.pkl"
+        self.dev_preprocess = f"{self.dataset_path}/validation/dialogues_validation_preprocess_ml_big.pkl"
+        self.test_preprocess = f"{self.dataset_path}/test/dialogues_test_preprocess_ml_big.pkl"
         self.model_save_path = f"{self.model_path}/dailyDialog/{self.model_name}.pt"
 
         self.num_classes = num_classes
@@ -146,10 +144,9 @@ class Emotion:
         # Read data file and flatten the dialogues into sentences
         dialogues = self.read_dialogue_data(data_path)
         inputs = []
-        for dialogue in dialogues:
-            for sentence in dialogue:
-                cleaned_sentence = self.preprocessor.clean(sentence, steps=self.steps)[0]
-                inputs.append(cleaned_sentence)
+        for sentence in dialogues:
+            cleaned_sentence = self.preprocessor.clean(sentence, steps=self.steps)[0]
+            inputs.append(cleaned_sentence)
 
         return (inputs, targets)
 
@@ -158,22 +155,22 @@ class Emotion:
         labels = labels[:self.limit]
         vectorizer = CountVectorizer()
         X = vectorizer.fit_transform(dialogues)
-        
-    
         # Ensure X is a NumPy array
         if not isinstance(X, np.ndarray):
             X = np.array(X)
-    
+
+        # Ensure that the length of labels matches the length of X
+        assert len(labels) == len(X), "The length of labels does not match the length of X."
+
         # Compute centroids for each class with for loop on num of class
         centroids = []
         for i in range(self.num_classes):
-            class_vectors = [X[j] for j in range(len(X)) if labels[j] == i]
+            class_vectors = [X[j] for j in range(len(labels)) if labels[j] == i]  # Use len(labels) for safety
             if class_vectors:
                 centroid = np.mean(class_vectors, axis=0)
             else:
                 centroid = np.zeros(X.shape[1])  # Use zeros if no vectors are present
             centroids.append(centroid)
-        
         self.helper.dump_tuple(self.model_save_path, (vectorizer, centroids))
 
     def evaluate_model(self, dialogues: List[str], labels: List[int]):
